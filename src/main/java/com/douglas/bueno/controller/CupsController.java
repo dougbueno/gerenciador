@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.douglas.bueno.model.Cup;
 import com.douglas.bueno.service.CupService;
 
-@CrossOrigin(origins = "http://localhost:8085")
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/cups")
 public class CupsController {
