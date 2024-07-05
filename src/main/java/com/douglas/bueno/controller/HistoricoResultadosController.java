@@ -25,16 +25,24 @@ public class HistoricoResultadosController {
 
 	@GetMapping("/")
 	public List<HistoricoResultados> getAllHistoricoResultados() {
-		return historicoRepository.findAll();
+		return historicoRepository.findAllByOrderByPontosDesc();
 	}
 
 	@PostMapping("/criar")
-	public HistoricoResultados createHistoricoResultados(@RequestBody HistoricoResultados historicoResultados) {
-		return historicoRepository.save(historicoResultados);
+	public ResponseEntity<?> createHistoricoResultados(@RequestBody List<HistoricoResultados> resultados) {
+		for (HistoricoResultados historicoResultados : resultados) {
+			historicoResultados
+					.setSaldoGol(historicoResultados.getGolsMarcados() - historicoResultados.getGolsSofridos());
+			historicoResultados.setQtdPartidas(historicoResultados.getVitoria() + historicoResultados.getEmpate()
+					+ historicoResultados.getDerrotas());
+
+			historicoRepository.save(historicoResultados);
+		}
+		return ResponseEntity.ok().build();
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<HistoricoResultados> updateUsuarios(@PathVariable Long id,
+	public ResponseEntity<HistoricoResultados> updateHistoricoResultados(@PathVariable Long id,
 			@RequestBody HistoricoResultados historicoResultados) {
 		Optional<HistoricoResultados> optionalHistoricoResultados = historicoRepository.findById(id);
 
@@ -59,7 +67,7 @@ public class HistoricoResultadosController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteUsuarios(@PathVariable Long id) {
+	public ResponseEntity<?> deleteHistoricoResultados(@PathVariable Long id) {
 		Optional<HistoricoResultados> optionalHistoricoResultados = historicoRepository.findById(id);
 
 		if (!optionalHistoricoResultados.isPresent()) {

@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.douglas.bueno.model.Campeonatos;
 import com.douglas.bueno.model.Cup;
-import com.douglas.bueno.repository.CampeonatosRepository;
+import com.douglas.bueno.service.CupService;
 
 @CrossOrigin(origins = "http://localhost:8085")
 @RestController
@@ -17,16 +16,11 @@ import com.douglas.bueno.repository.CampeonatosRepository;
 public class CupsController {
 
 	@Autowired
-	private CampeonatosRepository campeonatosRepository;
+	private CupService cupService;
 
 	@PostMapping("/criar")
 	public Cup createCampeonatos(@RequestBody Cup cup) {
-		return cup;
-	}
-	
-	@PostMapping("/sortear")
-	public Campeonatos sortearCampeonatos(@RequestBody Campeonatos campeonatos) {
-		return campeonatosRepository.save(campeonatos);
+		return cupService.sortear(cup);
 	}
 
 }
