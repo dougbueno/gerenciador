@@ -12,7 +12,7 @@
 	<artifactId>postegresql</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>postegresql</name>
-	<description>implementando postgresql como banco de dados</description>
+	<description>Gerenciador de resultados</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -49,6 +49,11 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
