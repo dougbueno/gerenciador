@@ -14,6 +14,7 @@
         <h1 class="mt-4">Cadastro de Usuários</h1>
 
         <form id="formUsuario">
+            <input type="hidden" id="usuarioId" name="usuarioId">
             <div class="form-group">
                 <label for="nome">Nome:</label>
                 <input type="text" class="form-control" id="nome" name="nome" required>
@@ -102,12 +103,22 @@
                     .catch(error => console.error('Erro ao carregar usuários:', error));
             }
 
-            // Função para editar um usuário (simulação de ação)
+            // Função para editar um usuário
             window.editarUsuario = function (id) {
-                alert(`Editar usuário com ID ${id}`);
+                fetch(`http://localhost:8080/api/usuarios/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('usuarioId').value = data.id;
+                        document.getElementById('nome').value = data.nome;
+                        carregarEquipes(); // Recarrega as equipes para garantir que o select seja atualizado
+                        setTimeout(() => { // Aguarda um breve momento para garantir que o select seja preenchido
+                            document.getElementById('equipe').value = data.equipe;
+                        }, 100);
+                    })
+                    .catch(error => console.error('Erro ao carregar usuário:', error));
             }
 
-            // Função para excluir um usuário (simulação de ação)
+            // Função para excluir um usuário
             window.excluirUsuario = function (id) {
                 if (confirm(`Tem certeza que deseja excluir o usuário com ID ${id}?`)) {
                     fetch(`http://localhost:8080/api/usuarios/${id}`, {
@@ -127,18 +138,22 @@
                 }
             }
 
-            // Submissão do formulário para gravar um novo usuário
+            // Submissão do formulário para gravar ou atualizar um usuário
             document.getElementById('formUsuario').addEventListener('submit', function (event) {
                 event.preventDefault();
 
                 const formData = new FormData(this);
+                const usuarioId = formData.get('usuarioId');
                 const usuario = {
                     nome: formData.get('nome'),
                     equipe: formData.get('equipe')
                 };
 
-                fetch('http://localhost:8080/api/usuarios/criar', {
-                    method: 'POST',
+                const url = usuarioId ? `http://localhost:8080/api/usuarios/${usuarioId}` : 'http://localhost:8080/api/usuarios/criar';
+                const method = usuarioId ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -151,6 +166,7 @@
                         alert('Usuário gravado com sucesso!');
                         carregarUsuarios(); // Atualiza a tabela após gravar o usuário com sucesso
                         this.reset(); // Limpa o formulário
+                        document.getElementById('usuarioId').value = ''; // Limpa o campo oculto de ID
                     })
                     .catch(error => {
                         console.error('Erro:', error);
