@@ -2,9 +2,11 @@ package com.douglas.bueno.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.douglas.bueno.dto.UsuarioTitulosDTO;
 import com.douglas.bueno.model.Titulos;
 import com.douglas.bueno.repository.TitulosRepository;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/titulos")
 public class TitulosController {
@@ -26,7 +30,15 @@ public class TitulosController {
 
 	@GetMapping
 	public List<Titulos> getAllTitulos() {
-		return titulosRepository.findAll();
+		return titulosRepository.findAllOrderedByAnoDescAndIdDesc();
+	}
+
+	@GetMapping("/listaCampeoes")
+	public List<UsuarioTitulosDTO> findOrderByMaxTitulos() {
+		List<Object[]> resultados =  titulosRepository.findOrderByMaxTitulos();
+		return resultados.stream()
+        .map(row -> new UsuarioTitulosDTO((String) row[0], (Long) row[1]))
+        .collect(Collectors.toList());
 	}
 
 	@PostMapping("/criar")
@@ -44,7 +56,7 @@ public class TitulosController {
 
 		Titulos existingTitulos = optionalTitulos.get();
 		existingTitulos.setAno(titulos.getAno());
-		existingTitulos.setCampeonatos(titulos.getCampeonatos());
+		existingTitulos.setCampeonato(titulos.getCampeonato());
 		existingTitulos.setUsuario(titulos.getUsuario());
 		existingTitulos.setEquipe(titulos.getEquipe());
 

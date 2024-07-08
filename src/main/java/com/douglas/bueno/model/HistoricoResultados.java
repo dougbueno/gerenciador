@@ -5,8 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -21,10 +19,8 @@ public class HistoricoResultados {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@ManyToOne
-	@JoinColumn(name = "usuario_id", referencedColumnName = "id")
-	private Usuarios usuario;
+	@Column(name = "usuario")
+	private String usuario;
 	@Column(name = "pontos")
 	private Integer pontos;
 	@Column(name = "qtdPartidas")
@@ -43,6 +39,5 @@ public class HistoricoResultados {
 	private Integer saldoGol;
 	@Column(name = "ano")
 	private Integer ano;
-	
 
 }

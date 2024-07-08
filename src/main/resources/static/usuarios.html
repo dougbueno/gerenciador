@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuários</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mt-4">Cadastro de Usuários</h1>
+
+        <form id="formUsuario">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" class="form-control" id="nome" name="nome" required>
+            </div>
+
+            <div class="form-group">
+                <label for="equipe">Equipe:</label>
+                <select class="form-control" id="equipe" name="equipe" required>
+                    <!-- Opções de equipe serão populadas dinamicamente via JavaScript -->
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Gravar</button>
+        </form>
+
+        <div class="mt-4">
+            <h2>Lista de Usuários</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Equipe</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaUsuarios">
+                    <!-- Linhas da tabela serão populadas dinamicamente via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3YqD+tgxtdd7SarY+z9VnAfo0Jw3gg6"
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            // Popula o dropdown de equipes ao carregar a página
+            carregarEquipes();
+
+            // Popula a lista de usuários ao carregar a página
+            carregarUsuarios();
+
+            // Função para carregar as equipes da API e popular o dropdown
+            function carregarEquipes() {
+                fetch('http://localhost:8080/api/equipes/')
+                    .then(response => response.json())
+                    .then(data => {
+                        const selectEquipe = document.getElementById('equipe');
+                        selectEquipe.innerHTML = ''; // Limpa o conteúdo atual do select
+
+                        data.forEach(equipe => {
+                            const option = document.createElement('option');
+                            option.value = equipe.nomeEquipe;
+                            option.textContent = equipe.nomeEquipe;
+                            selectEquipe.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar equipes:', error));
+            }
+
+            // Função para carregar os usuários da API e popular a tabela
+            function carregarUsuarios() {
+                fetch('http://localhost:8080/api/usuarios/')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tabelaUsuarios = document.getElementById('tabelaUsuarios');
+                        tabelaUsuarios.innerHTML = ''; // Limpa o conteúdo atual da tabela
+
+                        data.forEach(usuario => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${usuario.nome}</td>
+                                <td>${usuario.equipe}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" onclick="editarUsuario(${usuario.id})">Editar</button>
+                                    <button class="btn btn-sm btn-danger ml-2" onclick="excluirUsuario(${usuario.id})">Excluir</button>
+                                </td>
+                            `;
+                            tabelaUsuarios.appendChild(tr);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar usuários:', error));
+            }
+
+            // Função para editar um usuário (simulação de ação)
+            window.editarUsuario = function (id) {
+                alert(`Editar usuário com ID ${id}`);
+            }
+
+            // Função para excluir um usuário (simulação de ação)
+            window.excluirUsuario = function (id) {
+                if (confirm(`Tem certeza que deseja excluir o usuário com ID ${id}?`)) {
+                    fetch(`http://localhost:8080/api/usuarios/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro ao excluir usuário');
+                            }
+                            alert('Usuário excluído com sucesso!');
+                            carregarUsuarios(); // Atualiza a tabela após excluir o usuário com sucesso
+                        })
+                        .catch(error => {
+                            console.error('Erro:', error);
+                            alert('Ocorreu um erro ao excluir o usuário.');
+                        });
+                }
+            }
+
+            // Submissão do formulário para gravar um novo usuário
+            document.getElementById('formUsuario').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const usuario = {
+                    nome: formData.get('nome'),
+                    equipe: formData.get('equipe')
+                };
+
+                fetch('http://localhost:8080/api/usuarios/criar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(usuario)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao gravar usuário');
+                        }
+                        alert('Usuário gravado com sucesso!');
+                        carregarUsuarios(); // Atualiza a tabela após gravar o usuário com sucesso
+                        this.reset(); // Limpa o formulário
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        alert('Ocorreu um erro ao gravar o usuário.');
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

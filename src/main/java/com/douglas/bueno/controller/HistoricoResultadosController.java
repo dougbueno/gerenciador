@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,16 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.douglas.bueno.model.HistoricoResultados;
 import com.douglas.bueno.repository.HistoricoResultadosRepository;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/historico")
 public class HistoricoResultadosController {
 	@Autowired
 	private HistoricoResultadosRepository historicoRepository;
-
-	@GetMapping("/")
-	public List<HistoricoResultados> getAllHistoricoResultados() {
-		return historicoRepository.findAllByOrderByPontosDesc();
-	}
 
 	@PostMapping("/criar")
 	public ResponseEntity<?> createHistoricoResultados(@RequestBody List<HistoricoResultados> resultados) {
@@ -76,5 +73,75 @@ public class HistoricoResultadosController {
 
 		historicoRepository.deleteById(id);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/maisPontos")
+	public List<HistoricoResultados> findOneByMaxPontos() {
+		return historicoRepository.findOneByMaxPontos();
+	}
+
+	@GetMapping("/menosPontos")
+	public List<HistoricoResultados> findOneByMinPontos() {
+		return historicoRepository.findOneByMinPontos();
+	}
+
+	@GetMapping("/maisVitorias")
+	public List<HistoricoResultados> findOneByMaxVitoria() {
+		return historicoRepository.findOneByMaxVitoria();
+	}
+
+	@GetMapping("/menosVitorias")
+	public List<HistoricoResultados> findOneByMinVitoria() {
+		return historicoRepository.findOneByMinVitoria();
+	}
+
+	@GetMapping("/maisEmpates")
+	public List<HistoricoResultados> findOneByMaxEmpate() {
+		return historicoRepository.findOneByMaxEmpate();
+	}
+
+	@GetMapping("/menosEmpates")
+	public List<HistoricoResultados> findOneByMinEmpate() {
+		return historicoRepository.findOneByMinEmpate();
+	}
+
+	@GetMapping("/maisDerrotas")
+	public List<HistoricoResultados> findOneByMaxDerrotas() {
+		return historicoRepository.findOneByMaxDerrotas();
+	}
+
+	@GetMapping("/menosDerrotas")
+	public List<HistoricoResultados> findOneByMinDerrotas() {
+		return historicoRepository.findOneByMinDerrotas();
+	}
+
+	@GetMapping("/maisGolsMarcados")
+	public List<HistoricoResultados> findOneByMaxGolsMarcados() {
+		return historicoRepository.findOneByMaxGolsMarcados();
+	}
+
+	@GetMapping("/menosGolsMarcados")
+	public List<HistoricoResultados> findOneByMinGolsMarcados() {
+		return historicoRepository.findOneByMinGolsMarcados();
+	}
+
+	@GetMapping("/maisGolsSofridos")
+	public List<HistoricoResultados> findOneByMaxGolsSofridos() {
+		return historicoRepository.findOneByMaxGolsSofridos();
+	}
+
+	@GetMapping("/menosGolsSofridos")
+	public List<HistoricoResultados> findOneByMinGolsSofridos() {
+		return historicoRepository.findOneByMinGolsSofridos();
+	}
+
+	@GetMapping("/maisSaldoGol")
+	public List<HistoricoResultados> findOneByMaxSaldoGol() {
+		return historicoRepository.findOneByMaxSaldoGol();
+	}
+
+	@GetMapping("/menosSaldoGol")
+	public List<HistoricoResultados> findOneByMinSaldoGol() {
+		return historicoRepository.findOneByMinSaldoGol();
 	}
 }

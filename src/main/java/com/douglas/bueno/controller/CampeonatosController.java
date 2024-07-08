@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.douglas.bueno.model.Campeonatos;
 import com.douglas.bueno.repository.CampeonatosRepository;
 
-@CrossOrigin(origins = "http://localhost:8085")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/campeonatos")
 public class CampeonatosController {
