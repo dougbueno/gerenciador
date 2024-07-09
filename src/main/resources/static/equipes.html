@@ -9,6 +9,10 @@
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.122.0">
     <title>Equipes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"
+        integrity="sha512-ZTqZ9vOSL4kUyTC5h0gd3inWb6aEy6ppj1ebdQzwLRhPRycEwD+HqA7POc/Wg5SsY0C8aJoQRN2M9u5rn89W3w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbars/">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
     <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,10 +26,136 @@
     <div id="header"></div> <!-- Div where the header will be inserted -->
 
     <div class="container mt-4">
-        <h1 class="mt-4">Equipes</h1>
-        <p>Bem-vindo à Equipes. Navegue pelas diferentes seções usando o menu acima.</p>
+        <h1 class="mt-4">Cadastro de Equipes</h1>
+
+        <form id="formEquipe">
+            <input type="hidden" id="equipeId" name="equipeId">
+            <div class="form-group">
+                <label for="nomeEquipe">Nome da Equipe:</label>
+                <input type="text" class="form-control" id="nomeEquipe" name="nomeEquipe" required>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-4">Gravar</button>
+        </form>
+
+        <div class="mt-4">
+            <h2>Lista de Equipes</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome da Equipe</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaEquipes">
+                    <!-- Linhas da tabela serão populadas dinamicamente via JavaScript -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <script>
+        $(document).ready(function () {
+            carregarEquipes();
+
+            // Função para carregar as equipes da API e popular a tabela
+            function carregarEquipes() {
+                fetch('http://localhost:8080/api/equipes')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tabelaEquipes = document.getElementById('tabelaEquipes');
+                        tabelaEquipes.innerHTML = ''; // Limpa o conteúdo atual da tabela
+
+                        data.forEach(equipe => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${equipe.nomeEquipe}</td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editarEquipe(${equipe.id})">Editar</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="excluirEquipe(${equipe.id})">Excluir</button>
+                                </td>
+                            `;
+                            tabelaEquipes.appendChild(tr);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar equipes:', error));
+            }
+
+            // Função para editar uma equipe
+            window.editarEquipe = function (id) {
+                fetch(`http://localhost:8080/api/equipes/${id}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        document.getElementById('equipeId').value = data.id;
+                        document.getElementById('nomeEquipe').value = data.nomeEquipe;
+                    })
+                    .catch(error => console.error('Erro ao carregar equipe:', error));
+            }
+
+            // Função para excluir uma equipe
+            window.excluirEquipe = function (id) {
+                if (confirm(`Tem certeza que deseja excluir a equipe com ID ${id}?`)) {
+                    fetch(`http://localhost:8080/api/equipes/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            alert('Equipe excluída com sucesso!');
+                            carregarEquipes(); // Atualiza a tabela após excluir a equipe com sucesso
+                        })
+                        .catch(error => {
+                            console.error('Erro:', error);
+                            alert('Ocorreu um erro ao excluir a equipe.');
+                        });
+                }
+            }
+
+            // Submissão do formulário para gravar ou atualizar uma equipe
+            document.getElementById('formEquipe').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const equipeId = formData.get('equipeId');
+                const equipe = {
+                    nomeEquipe: formData.get('nomeEquipe')
+                };
+
+                const url = equipeId ? `http://localhost:8080/api/equipes/${equipeId}` : 'http://localhost:8080/api/equipes';
+                const method = equipeId ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(equipe)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        alert('Equipe gravada com sucesso!');
+                        carregarEquipes(); // Atualiza a tabela após gravar a equipe com sucesso
+                        this.reset(); // Limpa o formulário
+                        document.getElementById('equipeId').value = ''; // Limpa o campo oculto de ID
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        alert('Ocorreu um erro ao gravar a equipe.');
+                    });
+            });
+        });
+    </script>
 </body>
 
 </html>
