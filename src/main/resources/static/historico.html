@@ -5,10 +5,7 @@
     <script src="./assets/js/color-modes.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.122.0">
-    <title>Historico</title>
+    <title>Histórico</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -25,322 +22,91 @@
     <div id="header"></div> <!-- Div where the header will be inserted -->
     <div class="container mt-4">
 
-        <h1 class="mt-4">Criar Histórico de Campeonato:</h1>
-
-        <form id="forHistorico">
-            <input type="hidden" id="usuarioId" name="usuarioId">
-            <div class="row">
-                <div class="col">
-                    <label for="nome">Usuario:</label>
-                    <select class="form-control" id="nome" name="nome" required>
-                        <option value="" disabled selected>Selecione um Usuario</option>
-                        <!-- Opções de equipe serão populadas dinamicamente via JavaScript -->
-                    </select>
-                </div>
-                <div class="col">
-                    <label for="equipe">Equipe:</label>
-                    <input type="text" class="form-control" id="equipe" name="equipe" />
-                </div>
-                <div class="col">
-                    <label for="camp">Campeonato:</label>
-                    <select class="form-control" id="camp" name="camp" required>
-                        <option value="" disabled selected>Selecione uma Campeonato</option>
-                        <!-- Opções de equipe serão populadas dinamicamente via JavaScript -->
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <label for="pontos">Pontos:</label>
-                    <input type="number" class="form-control" id="pontos" name="pontos" value="0" min="0" />
-                </div>
-                <div class="col">
-                    <label for="vitorias">V:</label>
-                    <input type="number" class="form-control" id="vitorias" name="vitorias" value="0" min="0" />
-                </div>
-                <div class="col">
-                    <label for="derrotas">D:</label>
-                    <input type="number" class="form-control" id="derrotas" name="derrotas" value="0" min="0" />
-                </div>
-                <div class="col">
-                    <label for="empates">E:</label>
-                    <input type="number" class="form-control" id="empates" name="empates" value="0" min="0" />
-                </div>
-                <div class="col">
-                    <label for="gm">GF:</label>
-                    <input type="number" class="form-control" id="gm" name="gm" value="0" min="0" />
-                </div>
-                <div class="col">
-                    <label for="gs">GS:</label>
-                    <input type="number" class="form-control" id="gs" name="gs" value="0" />
-                </div>
-                <div class="col">
-                    <label for="sg">SG:</label>
-                    <input type="number" class="form-control" id="sg" name="sg" value="0" readonly />
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-success mt-4">Gravar</button>
-        </form>
-
-
-        <div class="mt-4">
-            <h2>Histórico</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Posição</th>
-                        <th scope="col">Usuario</th>
-                        <th scope="col">Equipe</th>
-                        <th scope="col">Campeonato</th>
-                        <th scope="col">P</th>
-                        <th scope="col">V</th>
-                        <th scope="col">D</th>
-                        <th scope="col">E</th>
-                        <th scope="col">GF</th>
-                        <th scope="col">GS</th>
-                        <th scope="col">SD</th>
-                        <th scope="col">Data</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaHistorico">
-                    <!-- Linhas da tabela serão populadas dinamicamente via JavaScript -->
-                </tbody>
-            </table>
-        </div>
+        <h1 class="mt-4">Histórico de Campeonatos:</h1>
+        <div id="historicoPorCampeonato"> </div>
     </div>
 
     <script>
         $(document).ready(function () {
-            // Adiciona eventos input para calcular o saldo de gols
-            $('#gm, #gs').on('input', function () {
-                const gm = parseFloat($('#gm').val()) || 0;
-                const gs = parseFloat($('#gs').val()) || 0;
-                const saldoGol = gm - gs;
-                $('#sg').val(saldoGol);
-            });
+            fetch('http://localhost:8080/api/historico/ordenado')
+                .then(response => response.json())
+                .then(data => {
+                    const historicoPorCampeonato = document.getElementById('historicoPorCampeonato');
+                    historicoPorCampeonato.innerHTML = ''; // Limpa o conteúdo atual
 
-            carregarUsuarios();
-            carregarCampeonatos();
-            carregarHistorico();
+                    const campeonatosPorOrdem = {};
 
-            // Função para carregar os usuários da API e popular o select
-            function carregarUsuarios() {
-                fetch('http://localhost:8080/api/usuarios')
-                    .then(response => response.json())
-                    .then(data => {
-                        const selectUsuario = document.getElementById('nome');
-                        selectUsuario.innerHTML = ''; // Limpa o conteúdo atual do select
+                    // Agrupa históricos por campeonato e ordem
+                    data.forEach(campeonatoObj => {
+                        const campeonato = campeonatoObj.campeonato;
+                        const historico = campeonatoObj.historico;
 
-                        const defaultOption = document.createElement('option');
-                        defaultOption.value = '';
-                        defaultOption.textContent = 'Selecione um Usuario';
-                        defaultOption.disabled = true;
-                        defaultOption.selected = true;
-                        selectUsuario.appendChild(defaultOption);
-
-                        data.forEach(usuario => {
-                            const option = document.createElement('option');
-                            option.value = usuario.id; // Usar ID como valor
-                            option.textContent = usuario.nome;
-                            selectUsuario.appendChild(option);
-                        });
-
-                        // Adicionar evento change ao select de usuário
-                        selectUsuario.addEventListener('change', function () {
-                            const selectedOption = this.options[this.selectedIndex];
-                            const nomeUsuario = selectedOption.textContent.trim();
-                            document.getElementById('equipe').value = ''; // Limpa o campo de equipe
-                            carregarEquipe(this.value);
-                            document.getElementById('nomeSelecionado').innerText = nomeUsuario; // Atualiza o nome do usuário selecionado
-                        });
-                    })
-                    .catch(error => console.error('Erro ao carregar usuários:', error));
-            }
-
-            // Função para carregar a equipe do usuário selecionado
-            function carregarEquipe(usuarioId) {
-                fetch(`http://localhost:8080/api/usuarios/${usuarioId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('equipe').value = data.equipe;
-                    })
-                    .catch(error => console.error('Erro ao carregar equipe:', error));
-            }
-
-            // Função para carregar os campeonatos da API e popular o select
-            function carregarCampeonatos() {
-                fetch('http://localhost:8080/api/campeonatos/')
-                    .then(response => response.json())
-                    .then(data => {
-                        const selectCampeonato = document.getElementById('camp');
-                        selectCampeonato.innerHTML = ''; // Limpa o conteúdo atual do select
-
-                        const defaultOption = document.createElement('option');
-                        defaultOption.value = '';
-                        defaultOption.textContent = 'Selecione uma Campeonato';
-                        defaultOption.disabled = true;
-                        defaultOption.selected = true;
-                        selectCampeonato.appendChild(defaultOption);
-
-                        data.forEach(campeonato => {
-                            const option = document.createElement('option');
-                            option.value = campeonato.id;
-                            option.textContent = campeonato.nomeCampeonato;
-                            option.dataset.nome = campeonato.nomeCampeonato;
-                            selectCampeonato.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erro ao carregar campeonatos:', error));
-            }
-
-            // Função para formatar a data no formato dd/mm/aaaa
-            function formatarData(dataISO) {
-                const dataObj = new Date(dataISO);
-                const dia = String(dataObj.getDate()).padStart(2, '0');
-                const mes = String(dataObj.getMonth() + 1).padStart(2, '0'); // Mês começa do zero
-                const ano = dataObj.getFullYear();
-                return `${dia}/${mes}/${ano}`;
-            }
-
-            // Função para carregar o histórico da API e popular a tabela
-            function carregarHistorico() {
-                fetch('http://localhost:8080/api/historico/')
-                    .then(response => response.json())
-                    .then(data => {
-                        const tabelaHistorico = document.getElementById('tabelaHistorico');
-                        tabelaHistorico.innerHTML = ''; // Limpa o conteúdo atual da tabela
-
-                        // Ordena os dados por pontos (decrescente)
-                        data.sort((a, b) => b.pontos - a.pontos);
-
-                        // Itera sobre os dados para criar as linhas da tabela
-                        data.forEach((equipe, index) => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${equipe.usuario}</td>
-                                <td>${equipe.equipe}</td>
-                                <td>${equipe.campeonato}</td>
-                                <td>${equipe.pontos}</td>
-                                <td>${equipe.vitoria}</td>
-                                <td>${equipe.derrotas}</td>
-                                <td>${equipe.empate}</td>
-                                <td>${equipe.golsMarcados}</td>
-                                <td>${equipe.golsSofridos}</td>
-                                <td>${equipe.saldoGol}</td>
-                                <td>${formatarData(equipe.data)}</td>
-                                <td>
-                                   <button class="btn btn-outline-primary btn-sm" onclick="editarEquipe(${equipe.id})">Editar</button>
-                                   <button class="btn btn-outline-danger btn-sm" onclick="excluirEquipe(${equipe.id})">Excluir</button>
-                                </td>
-                            `;
-                            tabelaHistorico.appendChild(tr);
-                        });
-                    })
-                    .catch(error => console.error('Erro ao carregar histórico:', error));
-            }
-
-            // Função para editar um registro de histórico
-            window.editarEquipe = function (id) {
-                fetch(`http://localhost:8080/api/historico/${id}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Ocorreu um erro ao carregar o registro. Status: ${response.status}`);
-                        }
-                        return response.json(); // Retorna os dados do registro como JSON
-                    })
-                    .then(data => {
-                        carregarUsuarios();
-                        carregarCampeonatos();
-                        // Preenche o formulário com os dados do registro
-                        document.getElementById('usuarioId').value = data.id;
-                        document.getElementById('nome').value = data.usuarioId; // Ajuste conforme necessário
-                        document.getElementById('equipe').value = data.equipe;
-                        document.getElementById('camp').value = data.campeonatoId; // Ajuste conforme necessário
-                        document.getElementById('pontos').value = data.pontos;
-                        document.getElementById('vitorias').value = data.vitoria;
-                        document.getElementById('derrotas').value = data.derrotas;
-                        document.getElementById('empates').value = data.empate;
-                        document.getElementById('gm').value = data.golsMarcados;
-                        document.getElementById('gs').value = data.golsSofridos;
-
-                        // Calcula o saldo de gols
-                        const saldoGol = data.golsMarcados - data.golsSofridos;
-                        document.getElementById('sg').value = saldoGol;
-
-                    })
-                    .catch(error => {
-                        console.error('Erro:', error);
-                        alert('Ocorreu um erro ao carregar o registro.');
-                    });
-            }
-
-            // Função para excluir uma equipe
-            window.excluirEquipe = function (id) {
-                if (confirm(`Tem certeza que deseja excluir a equipe com ID ${id}?`)) {
-                    fetch(`http://localhost:8080/api/historico/${id}`, {
-                        method: 'DELETE'
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
+                        historico.forEach(item => {
+                            const ordem = item.ordem;
+                            if (!campeonatosPorOrdem[ordem]) {
+                                campeonatosPorOrdem[ordem] = {};
                             }
-                            alert('Equipe excluída com sucesso!');
-                            carregarHistorico(); // Atualiza a tabela após excluir a equipe com sucesso
-                        })
-                        .catch(error => {
-                            console.error('Erro:', error);
-                            alert('Ocorreu um erro ao excluir a equipe.');
+                            if (!campeonatosPorOrdem[ordem][campeonato]) {
+                                campeonatosPorOrdem[ordem][campeonato] = [];
+                            }
+                            campeonatosPorOrdem[ordem][campeonato].push(item);
                         });
-                }
-            }
-
-            // Submissão do formulário para gravar ou atualizar uma equipe
-            document.getElementById('forHistorico').addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(this);
-                const usuarioId = formData.get('usuarioId');
-                const campeonatoId = formData.get('camp');
-                const campeonatoNome = document.querySelector(`#camp option[value="${campeonatoId}"]`).dataset.nome; // Obtém o nome do campeonato
-                const equipe = {
-                    usuario: document.getElementById('nome').options[document.getElementById('nome').selectedIndex].text,
-                    equipe: formData.get('equipe'),
-                    campeonato: campeonatoNome, // Envia o nome do campeonato
-                    pontos: formData.get('pontos'),
-                    vitoria: formData.get('vitorias'),
-                    empate: formData.get('empates'),
-                    derrotas: formData.get('derrotas'),
-                    golsMarcados: formData.get('gm'),
-                    golsSofridos: formData.get('gs'),
-                    saldoGol: formData.get('sg'),
-                };
-
-                const url = usuarioId ? `http://localhost:8080/api/historico/${usuarioId}` : 'http://localhost:8080/api/historico/resultado';
-                const method = usuarioId ? 'PUT' : 'POST';
-
-                fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(equipe)
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        alert('Equipe gravada com sucesso!');
-                        carregarHistorico(); // Atualiza a tabela após gravar a equipe com sucesso
-                        this.reset(); // Limpa o formulário
-                    })
-                    .catch(error => {
-                        console.error('Erro:', error);
-                        alert('Ocorreu um erro ao gravar a equipe.');
                     });
-            });
+
+                    // Ordena os campeonatos por ordem decrescente e exibe
+                    Object.keys(campeonatosPorOrdem).sort((a, b) => b - a).forEach(ordem => {
+                        const campeonatos = campeonatosPorOrdem[ordem];
+
+                        Object.keys(campeonatos).forEach(campeonato => {
+                            const historico = campeonatos[campeonato];
+
+                            // Ordena o histórico por pontos
+                            historico.sort((a, b) => b.pontos - a.pontos);
+                            // Cria o título do campeonato
+                            const tituloCampeonato = document.createElement('h2');
+                            tituloCampeonato.innerText = `${ordem}º ${campeonato}`;
+                            historicoPorCampeonato.appendChild(tituloCampeonato);
+
+                            // Cria a tabela para o campeonato
+                            const tabela = document.createElement('table');
+                            tabela.className = 'table';
+                            tabela.innerHTML = `
+            <thead>
+                <tr>
+                    <th scope="col">Posição</th>
+                    <th scope="col">Usuário</th>
+                    <th scope="col">Equipe</th>
+                    <th scope="col">P</th>
+                    <th scope="col">V</th>
+                    <th scope="col">D</th>
+                    <th scope="col">E</th>
+                    <th scope="col">GF</th>
+                    <th scope="col">GS</th>
+                    <th scope="col">SD</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${historico.map((item, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.usuario}</td>
+                        <td>${item.equipe}</td>
+                        <td>${item.pontos}</td>
+                        <td>${item.vitoria}</td>
+                        <td>${item.derrotas}</td>
+                        <td>${item.empate}</td>
+                        <td>${item.golsMarcados}</td>
+                        <td>${item.golsSofridos}</td>
+                        <td>${item.saldoGol}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        `;
+                            historicoPorCampeonato.appendChild(tabela);
+                        });
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar histórico:', error));
         });
     </script>
 </body>

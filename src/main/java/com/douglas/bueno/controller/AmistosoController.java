@@ -10,8 +10,8 @@ import com.douglas.bueno.model.Cup;
 import com.douglas.bueno.service.CupService;
 
 @RestController
-@RequestMapping("/api/cups")
-public class CupsController {
+@RequestMapping("/api/amistoso")
+public class AmistosoController {
 
 	@Autowired
 	private CupService cupService;

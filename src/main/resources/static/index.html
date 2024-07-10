@@ -5,9 +5,6 @@
     <script src="./assets/js/color-modes.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.122.0">
     <title>Home</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"
@@ -18,76 +15,276 @@
     <link href="./css/navbars.css" rel="stylesheet">
     <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/header.js"></script>
+    <style>
+        .card-body {
+            text-align: center;
+            /* Centraliza o conteúdo do card-body */
+        }
+    </style>
 </head>
 
 <body>
-    <div id="header"></div> <!-- Div where the header will be inserted -->
-
+    <div id="header"></div> <!-- Div onde o cabeçalho será inserido -->
     <div class="container mt-4">
-        <h2>Tabela de Pontuação</h2>
-        <table id="pontuacao-table" class="table">
-            <thead>
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Usuário</th>
-                    <th scope="col">Pontos</th>
-                    <th scope="col">Qtd. Partidas</th>
-                    <th scope="col">Vitórias</th>
-                    <th scope="col">Empates</th>
-                    <th scope="col">Derrotas</th>
-                    <th scope="col">Gols Marcados</th>
-                    <th scope="col">Gols Sofridos</th>
-                    <th scope="col">Saldo de Gols</th>
-                    <th scope="col">Ano</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dados serão inseridos aqui dinamicamente -->
-            </tbody>
-        </table>
 
-        <script>
-            // URL da API
-            const apiUrlmaisPontos = 'http://localhost:8080/api/historico/maisPontos';
+        <h1 class="mt-4">Bem-vindo ao Portal dos Campeonatos</h1>
 
-            // Função para carregar os dados da API e popular a tabela
-            async function carregarDados() {
-                try {
-                    const response = await fetch(apiUrlmaisPontos);
-                    const data = await response.json();
+        <!-- Seção de Campeonatos Atuais -->
+        <div class="my-4">
+            <h2>Campeonatos</h2>
+            <div id="campeonatos" class="row"></div>
+        </div>
 
-                    const tableBody = document.querySelector('#pontuacao-table tbody');
+        <div class="my-4">
+            <h2>Equipes</h2>
+            <div id="equipes" class="row"></div>
+        </div>
 
-                    // Limpa o corpo da tabela
-                    tableBody.innerHTML = '';
+        <div class="my-4">
+            <h2>Usuários</h2>
+            <div id="usuarios" class="row"></div>
+        </div>
 
-                    // Itera sobre os dados e cria as linhas da tabela
-                    data.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${item.id}</td>
-                            <td>${item.usuario}</td>
-                            <td>${item.pontos}</td>
-                            <td>${item.qtdPartidas}</td>
-                            <td>${item.vitoria}</td>
-                            <td>${item.empate}</td>
-                            <td>${item.derrotas}</td>
-                            <td>${item.golsMarcados}</td>
-                            <td>${item.golsSofridos}</td>
-                            <td>${item.saldoGol}</td>
-                            <td>${item.ano}</td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
-                }
+        <!-- Seção de Estatísticas Gerais -->
+        <div class="my-4">
+            <h2>Estatísticas Gerais</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total de Campeonatos</h5>
+                            <p class="card-text" id="totalCampeonatos"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total de Equipes</h5>
+                            <p class="card-text" id="totalEquipes"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total de Usuários</h5>
+                            <p class="card-text" id="totalUsuarios"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com mais Gols Feitos</h5>
+                            <p class="card-text" id="usuarioComMaisGolsMarcados"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com menos Gols Feitos</h5>
+                            <p class="card-text" id="usuarioComMenosGolsMarcados"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com mais Gols Sofridos</h5>
+                            <p class="card-text" id="usuarioComMaisGolsSofridos"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com menos Gols Sofridos</h5>
+                            <p class="card-text" id="usuarioComMenosGolsSofridos"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com mais Pontos</h5>
+                            <p class="card-text" id="usuarioComMaisPontos"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com menos Pontos</h5>
+                            <p class="card-text" id="usuarioComMenosPontos"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com mais Vitórias</h5>
+                            <p class="card-text" id="usuarioComMaisVitorias"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com menos Vitórias</h5>
+                            <p class="card-text" id="usuarioComMenosVitorias"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com mais Empates</h5>
+                            <p class="card-text" id="usuarioComMaisEmpates"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com menos Empates</h5>
+                            <p class="card-text" id="usuarioComMenosEmpates"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com mais Derrotas</h5>
+                            <p class="card-text" id="usuarioComMaisDerrotas"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuario com menos Derrotas</h5>
+                            <p class="card-text" id="usuarioComMenosDerrotas"></p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Função para buscar e preencher os campeonatos atuais
+            function carregarCampeonatos() {
+                // Fetch API para buscar os dados dos campeonatos
+                fetch('http://localhost:8080/api/campeonatos')
+                    .then(response => response.json())
+                    .then(data => {
+                        const campeonatosContainer = $('#campeonatos');
+                        campeonatosContainer.empty();
+
+                        data.forEach(campeonato => {
+                            const campeonatoCard = `
+                                 <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                           ${campeonato.nomeCampeonato}
+                                        </div>
+                                    </div><p></p>
+                                </div>`;
+                            campeonatosContainer.append(campeonatoCard);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar campeonatos:', error));
             }
 
-            // Chama a função para carregar os dados ao carregar a página
-            carregarDados();
-        </script>
+            function carregarEquipes() {
+                // Fetch API para buscar os dados das equipes
+                fetch('http://localhost:8080/api/equipes')
+                    .then(response => response.json())
+                    .then(data => {
+                        const equipesContainer = $('#equipes');
+                        equipesContainer.empty();
 
+                        data.forEach(equipe => {
+                            const equipeCard = `
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <img src="./imagens/${equipe.nomeEquipe}" alt="${equipe.nomeEquipe}" class="img-fluid">
+                                <p>${equipe.nomeEquipe}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                            equipesContainer.append(equipeCard);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar equipes:', error));
+            }
+
+
+            function carregarUsuarios() {
+                // Fetch API para buscar os dados dos campeonatos
+                fetch('http://localhost:8080/api/usuarios')
+                    .then(response => response.json())
+                    .then(data => {
+                        const usuarioContainer = $('#usuarios');
+                        usuarioContainer.empty();
+
+                        data.forEach(usuario => {
+                            const usuarioCard = `
+                                 <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            ${usuario.nome}
+                                        </div>
+                                    </div><p></p>
+                                </div>`;
+                            usuarioContainer.append(usuarioCard);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar usuarios:', error));
+            }
+
+            // Função para carregar estatísticas gerais
+            function carregarEstatisticasGerais() {
+                // Supondo que você tem um endpoint para estatísticas
+                fetch('http://localhost:8080/api/estatisticas')
+                    .then(response => response.json())
+                    .then(data => {
+                        $('#totalCampeonatos').text(data.totalCampeonatos);
+                        $('#totalEquipes').text(data.totalEquipes);
+                        $('#totalUsuarios').text(data.totalUsuarios);
+                        $('#usuarioComMaisGolsMarcados').text(data.usuarioComMaisGolsMarcados);
+                        $('#usuarioComMenosGolsMarcados').text(data.usuarioComMenosGolsMarcados);
+                        $('#usuarioComMaisGolsSofridos').text(data.usuarioComMaisGolsSofridos);
+                        $('#usuarioComMenosGolsSofridos').text(data.usuarioComMenosGolsSofridos);
+                        $('#usuarioComMaisVitorias').text(data.usuarioComMaisVitorias);
+                        $('#usuarioComMenosVitorias').text(data.usuarioComMenosVitorias);
+                        $('#usuarioComMaisPontos').text(data.usuarioComMaisPontos);
+                        $('#usuarioComMenosPontos').text(data.usuarioComMenosPontos);
+                        $('#usuarioComMaisDerrotas').text(data.usuarioComMaisDerrotas);
+                        $('#usuarioComMenosDerrotas').text(data.usuarioComMenosDerrotas);
+                        $('#usuarioComMaisEmpates').text(data.usuarioComMaisEmpates);
+                        $('#usuarioComMenosEmpates').text(data.usuarioComMenosEmpates);
+                    })
+                    .catch(error => console.error('Erro ao carregar estatísticas:', error));
+            }
+
+            // Chamadas para carregar dados na inicialização
+            carregarCampeonatos();
+            carregarEquipes();
+            carregarUsuarios();
+            carregarEstatisticasGerais();
+
+        });
+    </script>
 </body>
 
 </html>

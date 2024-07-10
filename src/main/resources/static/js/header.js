@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         <li class="nav-item">
                             <a class="nav-link" href="/cups.html">Cups</a>
                         </li>
+                         <li class="nav-item">
+                            <a class="nav-link" href="/amistoso.html">Amistoso</a>
+                        </li>
                     </ul>
                 </div>
             </div>

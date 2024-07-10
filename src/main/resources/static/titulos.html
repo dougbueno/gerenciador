@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.122.0">
-    <title>Equipes</title>
+    <title>Títulos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -21,132 +21,68 @@
 </head>
 
 <body>
+
     <div id="header"></div> <!-- Div where the header will be inserted -->
     <div class="container mt-4">
 
-        <h1 class="mt-4">Cadastro de Títulos</h1>
-
-        <form id="formTitulo">
-            <input type="hidden" id="tituloId" name="tituloId">
-            <div class="form-group">
-                <label for="nomeTitulo">Nome do Título:</label>
-                <input type="text" class="form-control" id="nomeTitulo" name="nomeTitulo" required>
-            </div>
-
-            <button type="submit" class="btn btn-success mt-4">Gravar</button>
-        </form>
-
-        <div class="mt-4">
-            <h2>Lista de Campeonatos</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Nome do Campeonato</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaCampeonato">
-                    <!-- Linhas da tabela serão populadas dinamicamente via JavaScript -->
-                </tbody>
-            </table>
-        </div>
+        <h1 class="mt-4">Títulos:</h1>
+        <div id="titulosContainer"> </div>
     </div>
 
     <script>
         $(document).ready(function () {
-            carregarCampeonatos();
+            fetch('http://localhost:8080/api/titulos')
+                .then(response => response.json())
+                .then(data => {
+                    const titulosContainer = document.getElementById('titulosContainer');
+                    titulosContainer.innerHTML = ''; // Limpa o conteúdo atual
 
-            // Função para carregar as equipes da API e popular a tabela
-            function carregarCampeonatos() {
-                fetch('http://localhost:8080/api/campeonatos')
-                    .then(response => response.json())
-                    .then(data => {
-                        const tabelaCampeonato = document.getElementById('tabelaCampeonato');
-                        tabelaCampeonato.innerHTML = ''; // Limpa o conteúdo atual da tabela
-
-                        data.forEach(campeonato => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>${campeonato.nomeCampeonato}</td>
-                                <td>
-                                    <button class="btn btn-outline-primary btn-sm" onclick="editarCampeonato(${campeonato.id})">Editar</button>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="excluirCampeonato(${campeonato.id})">Excluir</button>
-                                </td>
-                            `;
-                            tabelaCampeonato.appendChild(tr);
-                        });
-                    })
-                    .catch(error => console.error('Erro ao carregar equipes:', error));
-            }
-
-            // Função para editar uma equipe
-            window.editarCampeonato = function (id) {
-                fetch(`http://localhost:8080/api/campeonatos/${id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('campeonatoId').value = data.id;
-                        document.getElementById('nomeCampeonato').value = data.nomeCampeonato;
-                    })
-                    .catch(error => console.error('Erro ao carregar campeonato:', error));
-            }
-
-            // Função para excluir uma equipe
-            window.excluirCampeonato = function (id) {
-                if (confirm(`Tem certeza que deseja excluir a campeonato com ID ${id}?`)) {
-                    fetch(`http://localhost:8080/api/campeonatos/${id}`, {
-                        method: 'DELETE'
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            alert('Campeonato excluído com sucesso!');
-                            carregarCampeonatos(); // Atualiza a tabela após excluir a equipe com sucesso
-                        })
-                        .catch(error => {
-                            console.error('Erro:', error);
-                            alert('Ocorreu um erro ao excluir a campeonato.');
-                        });
-                }
-            }
-
-            // Submissão do formulário para gravar ou atualizar uma equipe
-            document.getElementById('formCampeonato').addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(this);
-                const campeonatoId = formData.get('campeonatoId');
-                const campeonato = {
-                    nomeCampeonato: formData.get('nomeCampeonato')
-                };
-
-                const url = campeonatoId ? `http://localhost:8080/api/campeonatos/${campeonatoId}` : 'http://localhost:8080/api/campeonatos';
-                const method = campeonatoId ? 'PUT' : 'POST';
-
-                fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(campeonato)
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                    // Agrupa os títulos por campeonato
+                    const campeonatos = data.reduce((acc, titulo) => {
+                        if (!acc[titulo.campeonato]) {
+                            acc[titulo.campeonato] = [];
                         }
-                        return response.json();
-                    })
-                    .then(() => {
-                        alert('Campeonato gravado com sucesso!');
-                        carregarCampeonatos(); // Atualiza a tabela após gravar a equipe com sucesso
-                        this.reset(); // Limpa o formulário
-                        document.getElementById('campeonatoId').value = ''; // Limpa o campo oculto de ID
-                    })
-                    .catch(error => {
-                        console.error('Erro:', error);
-                        alert('Ocorreu um erro ao gravar o campeonato.');
+                        acc[titulo.campeonato].push(titulo);
+                        return acc;
+                    }, {});
+
+                    // Cria a estrutura para cada campeonato
+                    Object.keys(campeonatos).forEach(campeonato => {
+                        const titulos = campeonatos[campeonato];
+
+                        // Ordena os títulos por ano decrescente dentro de cada campeonato
+                        titulos.sort((a, b) => b.ano - a.ano);
+
+                        // Cria o título do campeonato
+                        const tituloCampeonato = document.createElement('h2');
+                        tituloCampeonato.innerText = campeonato;
+                        titulosContainer.appendChild(tituloCampeonato);
+
+                        // Cria a tabela para o campeonato
+                        const tabela = document.createElement('table');
+                        tabela.className = 'table';
+                        tabela.innerHTML = `
+                            <thead>
+                                <tr>
+                                    <th scope="col">Ano</th>
+                                    <th scope="col">Usuário</th>
+                                    <th scope="col">Equipe</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${titulos.map(titulo => `
+                                    <tr>
+                                        <td>${titulo.ano}</td>
+                                        <td>${titulo.usuario}</td>
+                                        <td>${titulo.equipe}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        `;
+                        titulosContainer.appendChild(tabela);
                     });
-            });
+                })
+                .catch(error => console.error('Erro ao carregar títulos:', error));
         });
     </script>
 </body>
