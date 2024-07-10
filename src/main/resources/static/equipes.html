@@ -21,10 +21,9 @@
 </head>
 
 <body>
-
     <div id="header"></div> <!-- Div where the header will be inserted -->
-
     <div class="container mt-4">
+
         <h1 class="mt-4">Cadastro de Equipes</h1>
 
         <form id="formEquipe">
@@ -83,12 +82,7 @@
             // Função para editar uma equipe
             window.editarEquipe = function (id) {
                 fetch(`http://localhost:8080/api/equipes/${id}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         document.getElementById('equipeId').value = data.id;
                         document.getElementById('nomeEquipe').value = data.nomeEquipe;

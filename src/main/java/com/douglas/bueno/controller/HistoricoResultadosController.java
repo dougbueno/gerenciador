@@ -15,26 +15,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.douglas.bueno.model.Equipes;
 import com.douglas.bueno.model.HistoricoResultados;
 import com.douglas.bueno.repository.HistoricoResultadosRepository;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/historico")
 public class HistoricoResultadosController {
 	@Autowired
 	private HistoricoResultadosRepository historicoRepository;
+	
+	@GetMapping("/{id}")
+	public Optional<HistoricoResultados> getById(@PathVariable Long id) {
+		return historicoRepository.findById(id);
+	}
 
-	@PostMapping("/criar")
-	public ResponseEntity<?> createHistoricoResultados(@RequestBody List<HistoricoResultados> resultados) {
+	@PostMapping("/lista")
+	public ResponseEntity<?> createListaResultados(@RequestBody List<HistoricoResultados> resultados) {
 		for (HistoricoResultados historicoResultados : resultados) {
-			historicoResultados
-					.setSaldoGol(historicoResultados.getGolsMarcados() - historicoResultados.getGolsSofridos());
-			historicoResultados.setQtdPartidas(historicoResultados.getVitoria() + historicoResultados.getEmpate()
-					+ historicoResultados.getDerrotas());
-
+			
 			historicoRepository.save(historicoResultados);
 		}
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/resultado")
+	public ResponseEntity<?> createHistoricoResultados(@RequestBody HistoricoResultados historicoResultados) {
+
+		historicoRepository.save(historicoResultados);
+
 		return ResponseEntity.ok().build();
 	}
 
@@ -48,16 +57,17 @@ public class HistoricoResultadosController {
 		}
 
 		HistoricoResultados existingHistorico = optionalHistoricoResultados.get();
+		existingHistorico.setId(id);
 		existingHistorico.setUsuario(historicoResultados.getUsuario());
+		existingHistorico.setEquipe(historicoResultados.getEquipe());
+		existingHistorico.setCampeonato(historicoResultados.getCampeonato());
 		existingHistorico.setPontos(historicoResultados.getPontos());
-		existingHistorico.setQtdPartidas(historicoResultados.getQtdPartidas());
 		existingHistorico.setVitoria(historicoResultados.getVitoria());
 		existingHistorico.setDerrotas(historicoResultados.getDerrotas());
 		existingHistorico.setEmpate(historicoResultados.getEmpate());
 		existingHistorico.setGolsMarcados(historicoResultados.getGolsMarcados());
 		existingHistorico.setGolsSofridos(historicoResultados.getGolsSofridos());
 		existingHistorico.setSaldoGol(historicoResultados.getSaldoGol());
-		existingHistorico.setAno(historicoResultados.getAno());
 
 		HistoricoResultados updatedHistoricoResultados = historicoRepository.save(existingHistorico);
 		return ResponseEntity.ok(updatedHistoricoResultados);
@@ -73,6 +83,11 @@ public class HistoricoResultadosController {
 
 		historicoRepository.deleteById(id);
 		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping
+	public List<HistoricoResultados> findAll() {
+		return historicoRepository.findAllByOrderByPontosDesc();
 	}
 
 	@GetMapping("/maisPontos")

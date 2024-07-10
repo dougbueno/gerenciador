@@ -27,6 +27,11 @@ public class EquipesController {
 	public List<Equipes> getAllEquipes() {
 		return equipesRepository.findAllByOrderByNomeEquipeAsc();
 	}
+	
+	@GetMapping("/{id}")
+	public Optional<Equipes> getById(@PathVariable Long id) {
+		return equipesRepository.findById(id);
+	}
 
 	@PostMapping
 	public Equipes createEquipes(@RequestBody Equipes equipes) {

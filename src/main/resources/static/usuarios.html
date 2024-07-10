@@ -125,6 +125,7 @@
                     .then(data => {
                         document.getElementById('usuarioId').value = data.id;
                         document.getElementById('nome').value = data.nome;
+                        document.getElementById('equipe').value = data.equipe;
 
                     })
                     .catch(error => console.error('Erro ao carregar usuário:', error));

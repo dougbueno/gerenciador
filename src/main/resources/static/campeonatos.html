@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.122.0">
-    <title>Campeonatos</title>
+    <title>Equipes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -21,14 +21,134 @@
 </head>
 
 <body>
-
     <div id="header"></div> <!-- Div where the header will be inserted -->
-
     <div class="container mt-4">
-        <h1 class="mt-4">Campeonatos</h1>
-        <p>Bem-vindo à Campeonatos. Navegue pelas diferentes seções usando o menu acima.</p>
+
+        <h1 class="mt-4">Cadastro de Campeonatos</h1>
+
+        <form id="formCampeonato">
+            <input type="hidden" id="campeonatoId" name="campeonatoId">
+            <div class="form-group">
+                <label for="nomeCampeonato">Nome do Campeonato:</label>
+                <input type="text" class="form-control" id="nomeCampeonato" name="nomeCampeonato" required>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-4">Gravar</button>
+        </form>
+
+        <div class="mt-4">
+            <h2>Lista de Campeonatos</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome do Campeonato</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaCampeonato">
+                    <!-- Linhas da tabela serão populadas dinamicamente via JavaScript -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <script>
+        $(document).ready(function () {
+            carregarCampeonatos();
+
+            // Função para carregar as equipes da API e popular a tabela
+            function carregarCampeonatos() {
+                fetch('http://localhost:8080/api/campeonatos')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tabelaCampeonato = document.getElementById('tabelaCampeonato');
+                        tabelaCampeonato.innerHTML = ''; // Limpa o conteúdo atual da tabela
+
+                        data.forEach(campeonato => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${campeonato.nomeCampeonato}</td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editarCampeonato(${campeonato.id})">Editar</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="excluirCampeonato(${campeonato.id})">Excluir</button>
+                                </td>
+                            `;
+                            tabelaCampeonato.appendChild(tr);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar equipes:', error));
+            }
+
+            // Função para editar uma equipe
+            window.editarCampeonato = function (id) {
+                fetch(`http://localhost:8080/api/campeonatos/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('campeonatoId').value = data.id;
+                        document.getElementById('nomeCampeonato').value = data.nomeCampeonato;
+                    })
+                    .catch(error => console.error('Erro ao carregar campeonato:', error));
+            }
+
+            // Função para excluir uma equipe
+            window.excluirCampeonato = function (id) {
+                if (confirm(`Tem certeza que deseja excluir a campeonato com ID ${id}?`)) {
+                    fetch(`http://localhost:8080/api/campeonatos/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            alert('Campeonato excluído com sucesso!');
+                            carregarCampeonatos(); // Atualiza a tabela após excluir a equipe com sucesso
+                        })
+                        .catch(error => {
+                            console.error('Erro:', error);
+                            alert('Ocorreu um erro ao excluir a campeonato.');
+                        });
+                }
+            }
+
+            // Submissão do formulário para gravar ou atualizar uma equipe
+            document.getElementById('formCampeonato').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const campeonatoId = formData.get('campeonatoId');
+                const campeonato = {
+                    nomeCampeonato: formData.get('nomeCampeonato')
+                };
+
+                const url = campeonatoId ? `http://localhost:8080/api/campeonatos/${campeonatoId}` : 'http://localhost:8080/api/campeonatos';
+                const method = campeonatoId ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(campeonato)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        alert('Campeonato gravado com sucesso!');
+                        carregarCampeonatos(); // Atualiza a tabela após gravar a equipe com sucesso
+                        this.reset(); // Limpa o formulário
+                        document.getElementById('campeonatoId').value = ''; // Limpa o campo oculto de ID
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        alert('Ocorreu um erro ao gravar o campeonato.');
+                    });
+            });
+        });
+    </script>
 </body>
 
 </html>

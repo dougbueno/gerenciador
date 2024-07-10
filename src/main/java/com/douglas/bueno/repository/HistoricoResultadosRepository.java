@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import com.douglas.bueno.model.HistoricoResultados;
 
 public interface HistoricoResultadosRepository extends JpaRepository<HistoricoResultados, Long> {
-
+	List<HistoricoResultados> findAllByOrderByPontosDesc();
+	
 	@Query("SELECT hr FROM HistoricoResultados hr WHERE hr.pontos = (SELECT MAX(hr2.pontos) FROM HistoricoResultados hr2)")
 	List<HistoricoResultados> findOneByMaxPontos();
 
