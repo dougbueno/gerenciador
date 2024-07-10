@@ -49,7 +49,7 @@
         <div class="my-4">
             <h2>Estatísticas Gerais</h2>
             <div class="row">
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Total de Campeonatos</h5>
@@ -57,7 +57,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Total de Equipes</h5>
@@ -65,7 +65,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Total de Usuários</h5>
@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com mais Gols Feitos</h5>
@@ -81,7 +81,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com menos Gols Feitos</h5>
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com mais Gols Sofridos</h5>
@@ -97,7 +97,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com menos Gols Sofridos</h5>
@@ -105,7 +105,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com mais Pontos</h5>
@@ -113,7 +113,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com menos Pontos</h5>
@@ -121,7 +121,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com mais Vitórias</h5>
@@ -129,7 +129,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com menos Vitórias</h5>
@@ -138,7 +138,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com mais Empates</h5>
@@ -146,7 +146,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com menos Empates</h5>
@@ -155,7 +155,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com mais Derrotas</h5>
@@ -163,7 +163,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Usuario com menos Derrotas</h5>
@@ -191,7 +191,7 @@
 
                         data.forEach(campeonato => {
                             const campeonatoCard = `
-                                 <div class="col-md-3">
+                                 <div class="col-md-2">
                                     <div class="card">
                                         <div class="card-body">
                                            ${campeonato.nomeCampeonato}
@@ -205,7 +205,6 @@
             }
 
             function carregarEquipes() {
-                // Fetch API para buscar os dados das equipes
                 fetch('http://localhost:8080/api/equipes')
                     .then(response => response.json())
                     .then(data => {
@@ -214,19 +213,19 @@
 
                         data.forEach(equipe => {
                             const equipeCard = `
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="card">
                             <div class="card-body">
-                                <img src="./imagens/${equipe.nomeEquipe}" alt="${equipe.nomeEquipe}" class="img-fluid">
-                                <p>${equipe.nomeEquipe}</p>
+                                  ${equipe.nomeEquipe}
                             </div>
-                        </div>
+                        </div><p></p>
                     </div>`;
                             equipesContainer.append(equipeCard);
                         });
                     })
                     .catch(error => console.error('Erro ao carregar equipes:', error));
             }
+
 
 
             function carregarUsuarios() {
@@ -239,7 +238,7 @@
 
                         data.forEach(usuario => {
                             const usuarioCard = `
-                                 <div class="col-md-3">
+                                 <div class="col-md-2">
                                     <div class="card">
                                         <div class="card-body">
                                             ${usuario.nome}
