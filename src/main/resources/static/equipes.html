@@ -38,7 +38,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Nome da Equipe</th>
+                        <th scope="col">Equipe</th>
                         <th scope="col">Ações</th>
                     </tr>
                 </thead>
@@ -64,7 +64,7 @@
                         data.forEach(equipe => {
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
-                                <td>${equipe.nomeEquipe}</td>
+                                <td><img src="/imagens/${equipe.nomeEquipe}.png" alt=" ${equipe.nomeEquipe}"></td>
                                 <td>
                                     <button class="btn btn-outline-primary btn-sm" onclick="editarEquipe(${equipe.id})">Editar</button>
                                     <button class="btn btn-outline-danger btn-sm" onclick="excluirEquipe(${equipe.id})">Excluir</button>

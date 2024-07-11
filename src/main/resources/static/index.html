@@ -192,11 +192,8 @@
                         data.forEach(campeonato => {
                             const campeonatoCard = `
                                  <div class="col-md-2">
-                                    <div class="card">
-                                        <div class="card-body">
-                                           ${campeonato.nomeCampeonato}
-                                        </div>
-                                    </div><p></p>
+                                          <img src="/imagens/${campeonato.nomeCampeonato}.png" alt="${campeonato.nomeCampeonato}">
+                                 <p></p>
                                 </div>`;
                             campeonatosContainer.append(campeonatoCard);
                         });
@@ -214,11 +211,8 @@
                         data.forEach(equipe => {
                             const equipeCard = `
                     <div class="col-md-2">
-                        <div class="card">
-                            <div class="card-body">
-                                  ${equipe.nomeEquipe}
-                            </div>
-                        </div><p></p>
+                       <img src="/imagens/${equipe.nomeEquipe}.png" alt=" ${equipe.nomeEquipe}">
+                          <p></p>
                     </div>`;
                             equipesContainer.append(equipeCard);
                         });
