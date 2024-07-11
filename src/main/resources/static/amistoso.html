@@ -15,17 +15,153 @@
     <link href="./css/navbars.css" rel="stylesheet">
     <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/header.js"></script>
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
 </head>
 
 <body>
 
     <div id="header"></div> <!-- Div where the header will be inserted -->
-
-    <div class="container mt-4">
-        <h1 class="mt-4">Amistoso</h1>
-        <p>Bem-vindo à Amistoso. Navegue pelas diferentes seções usando o menu acima.</p>
+    <div class="container">
+        <h1 class="mb-4">Registrar Amistoso</h1>
+        <form id="amistosoForm">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Casa</th>
+                        <th>Gols Casa</th>
+                        <th>X</th>
+                        <th>Gols Visitante</th>
+                        <th>Visitante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-select" id="casa" name="casa" required>
+                                <option value="">Selecione um usuário</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" id="golsCasa" name="golsCasa" required>
+                        </td>
+                        <td>X</td>
+                        <td>
+                            <input type="number" class="form-control" id="golsVisitante" name="golsVisitante" required>
+                        </td>
+                        <td>
+                            <select class="form-select" id="visitante" name="visitante" required>
+                                <option value="">Selecione um usuário</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success">Salvar</button>
+        </form>
+        <div id="resultMessage" class="mt-3"></div>
     </div>
 
+    <div class="container mt-5">
+        <h2>Estatísticas dos Jogadores</h2>
+        <table class="table table-bordered mt-2" id="estatisticasTable">
+            <thead>
+                <tr>
+                    <th>Jogador</th>
+                    <th>Vitórias</th>
+                    <th>Empates</th>
+                    <th>Derrotas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Conteúdo será inserido pelo JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const casaSelect = document.getElementById('casa');
+            const visitanteSelect = document.getElementById('visitante');
+
+            fetch('http://localhost:8080/api/usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(usuario => {
+                        const option = document.createElement('option');
+                        option.value = usuario.nome;
+                        option.textContent = usuario.nome;
+                        casaSelect.appendChild(option);
+
+                        const optionClone = option.cloneNode(true);
+                        visitanteSelect.appendChild(optionClone);
+                    });
+                    carregarEstatisticas();
+                })
+                .catch(error => console.error('Erro ao carregar usuários:', error));
+        });
+
+        document.getElementById('amistosoForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Previne o comportamento padrão do formulário
+
+            const casa = document.getElementById('casa').value;
+            const golsCasa = document.getElementById('golsCasa').value;
+            const visitante = document.getElementById('visitante').value;
+            const golsVisitante = document.getElementById('golsVisitante').value;
+
+            const data = {
+                casa: casa,
+                golsCasa: golsCasa,
+                visitante: visitante,
+                golsVisitante: golsVisitante
+            };
+
+            fetch('http://localhost:8080/api/amistoso', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById('resultMessage').innerHTML = '<div class="alert alert-success">Amistoso registrado com sucesso!</div>';
+                        carregarEstatisticas();
+                    } else {
+                        document.getElementById('resultMessage').innerHTML = '<div class="alert alert-danger">Erro ao registrar o amistoso.</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    document.getElementById('resultMessage').innerHTML = '<div class="alert alert-danger">Erro ao registrar o amistoso.</div>';
+                });
+        });
+
+        function carregarEstatisticas() {
+            fetch('http://localhost:8080/api/estatisticas')
+                .then(response => response.json())
+                .then(data => {
+                    const estatisticasTableBody = document.querySelector('#estatisticasTable tbody');
+                    estatisticasTableBody.innerHTML = '';
+
+                    data.forEach(estatistica => {
+                        const row = `
+                            <tr>
+                                <td>${estatistica.jogador}</td>
+                                <td>${estatistica.vitorias}</td>
+                                <td>${estatistica.empates}</td>
+                                <td>${estatistica.derrotas}</td>
+                            </tr>
+                        `;
+                        estatisticasTableBody.insertAdjacentHTML('beforeend', row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar estatísticas:', error));
+        }
+    </script>
 </body>
 
 </html>

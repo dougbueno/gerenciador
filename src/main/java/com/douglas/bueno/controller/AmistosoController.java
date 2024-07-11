@@ -6,19 +6,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.douglas.bueno.model.Cup;
-import com.douglas.bueno.service.CupService;
+import com.douglas.bueno.model.Amistoso;
+import com.douglas.bueno.repository.AmistosoRepository;
 
 @RestController
 @RequestMapping("/api/amistoso")
 public class AmistosoController {
 
 	@Autowired
-	private CupService cupService;
+	private AmistosoRepository amistosoRepository;
 
 	@PostMapping
-	public Cup createCampeonatos(@RequestBody Cup cup) {
-		return cupService.sortear(cup);
+	public Amistoso createCampeonatos(@RequestBody Amistoso amistoso) {
+		return amistosoRepository.save(amistoso);
 	}
 
 }
