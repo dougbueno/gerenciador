@@ -20,7 +20,6 @@ import com.douglas.bueno.dto.UsuarioTitulosDTO;
 import com.douglas.bueno.model.Titulos;
 import com.douglas.bueno.repository.TitulosRepository;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/titulos")
 public class TitulosController {
@@ -41,7 +40,7 @@ public class TitulosController {
         .collect(Collectors.toList());
 	}
 
-	@PostMapping("/criar")
+	@PostMapping
 	public Titulos createTitulos(@RequestBody Titulos titulos) {
 		return titulosRepository.save(titulos);
 	}

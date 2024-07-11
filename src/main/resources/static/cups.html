@@ -1,11 +1,11 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 
 <head>
     <script src="./assets/js/color-modes.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cups</title>
+    <title>Gerenciador de Campeonatos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -18,14 +18,265 @@
 </head>
 
 <body>
-
-    <div id="header"></div> <!-- Div where the header will be inserted -->
-
-    <div class="container mt-4">
-        <h1 class="mt-4">Cups</h1>
-        <p>Bem-vindo à Cups. Navegue pelas diferentes seções usando o menu acima.</p>
+    <div id="header"></div>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Gerenciador de Cups</h1>
+        <div class="row">
+            <div class="col-lg-6">
+                <form id="campeonatoForm">
+                    <div class="mb-3">
+                        <label class="form-label">Cup</label>
+                        <div id="campeonatoContainer">
+                            <!-- Checkbox de campeonatos será preenchido dinamicamente -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Jogador</label>
+                        <div id="usuariosContainer">
+                            <!-- Checkbox de usuários será preenchido dinamicamente -->
+                        </div>
+                    </div>
+                    <button id="submitBtn" type="submit" class="btn btn-primary">Criar Campeonato</button>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <h2 id="campeonatoSelecionado"></h2>
+                <table class="table" id="tabelaClassificacao">
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Equipe</th>
+                            <th>P</th>
+                            <th>V</th>
+                            <th>E</th>
+                            <th>D</th>
+                            <th>GM</th>
+                            <th>GS</th>
+                            <th>SG</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaClassificacaoBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-lg-12">
+                <h2>Tabela de Jogos</h2>
+                <table class="table" id="tabelaJogos">
+                    <thead>
+                        <tr>
+                            <th>Time Casa</th>
+                            <th>Gols Casa</th>
+                            <th>Time Visitante</th>
+                            <th>Gols Visitante</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaJogosBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
+    <script>
+        // Carregar campeonatos ao carregar a página
+        $(document).ready(function () {
+            carregarCampeonatos();
+            carregarUsuarios();
+        });
+
+        // Função para carregar os campeonatos disponíveis
+        function carregarCampeonatos() {
+            fetch('http://localhost:8080/api/campeonatos')
+                .then(response => response.json())
+                .then(data => {
+                    const campeonatoContainer = document.getElementById('campeonatoContainer');
+                    campeonatoContainer.innerHTML = '';
+                    data.forEach(campeonato => {
+                        const checkbox = `
+                                <div class="form-check">
+                                    <input class="form-check-input campeonato-checkbox" type="checkbox" id="campeonato-${campeonato.id}" value="${campeonato.nomeCampeonato}">
+                                    <label class="form-check-label" for="campeonato-${campeonato.id}">
+                                        ${campeonato.nomeCampeonato}
+                                    </label>
+                                </div>
+                            `;
+                        campeonatoContainer.insertAdjacentHTML('beforeend', checkbox);
+                    });
+
+                    // Adicionar evento para desabilitar usuários ao selecionar campeonato
+                    const campeonatoCheckboxes = document.querySelectorAll('.campeonato-checkbox');
+                    campeonatoCheckboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', function () {
+                            if (this.checked) {
+                                desabilitarCampeonatos();
+                            } else {
+                                habilitarCampeonatos();
+                            }
+                        });
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar Campeonatos:', error));
+        }
+
+        // Função para desabilitar checkboxes de usuários
+        function desabilitarCampeonatos() {
+            const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = true;
+            });
+        }
+
+        // Função para habilitar checkboxes de usuários
+        function habilitarCampeonatos() {
+            const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = false;
+            });
+        }
+
+        // Função para carregar os usuários disponíveis
+        function carregarUsuarios() {
+            fetch('http://localhost:8080/api/usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    const usuariosContainer = document.getElementById('usuariosContainer');
+                    usuariosContainer.innerHTML = '';
+
+                    data.forEach(usuario => {
+                        const checkbox = `
+                                <div class="form-check">
+                                    <input class="form-check-input usuario-checkbox" type="checkbox" id="usuario-${usuario.id}" value="${usuario.equipe}">
+                                    <label class="form-check-label" for="usuario-${usuario.id}">
+                                        ${usuario.nome}
+                                    </label>
+                                </div>
+                            `;
+                        usuariosContainer.insertAdjacentHTML('beforeend', checkbox);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar usuários:', error));
+        }
+
+        document.getElementById('campeonatoForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const campeonatoSelecionado = obterCampeonatoSelecionado();
+            const usuariosSelecionados = obterUsuariosSelecionados();
+
+            if (!campeonatoSelecionado) {
+                alert('Selecione um campeonato!');
+                return;
+            }
+
+            if (usuariosSelecionados.length === 0) {
+                alert('Selecione pelo menos um usuário!');
+                return;
+            }
+
+            // Desabilita o botão de submit após submeter o formulário
+            document.getElementById('submitBtn').disabled = true;
+
+            // Atualiza o título da página com o nome do campeonato selecionado
+            document.getElementById('campeonatoSelecionado').textContent = `Tabela de Classificação - ${campeonatoSelecionado.value}`;
+
+            // Criar o campeonato com os usuários selecionados
+            criarTabelaClassificacao(campeonatoSelecionado.value, usuariosSelecionados);
+
+            // Desabilitar checkboxes de usuários após criar o campeonato
+            desabilitarUsuarios();
+        });
+
+        function desabilitarUsuarios() {
+            const checkboxes = document.querySelectorAll('#usuariosContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = true;
+            });
+        }
+
+        // Função para obter o campeonato selecionado
+        function obterCampeonatoSelecionado() {
+            const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    return checkboxes[i];
+                }
+            }
+            return null;
+        }
+
+        // Função para obter os usuários selecionados
+        function obterUsuariosSelecionados() {
+            const usuariosSelecionados = [];
+            const checkboxes = document.querySelectorAll('#usuariosContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    usuariosSelecionados.push({
+                        equipe: checkbox.value,
+                        pontos: 0, // Definir pontos inicialmente como 0
+                        vitorias: 0,
+                        empates: 0,
+                        derrotas: 0,
+                        golsMarcados: 0,
+                        golsSofridos: 0,
+                        saldoGols: 0
+                    });
+                }
+            });
+            return usuariosSelecionados;
+        }
+
+        // Função para criar a tabela de classificação com base nos usuários selecionados
+        function criarTabelaClassificacao(campeonato, usuarios) {
+            const tabelaClassificacaoBody = document.getElementById('tabelaClassificacaoBody');
+            tabelaClassificacaoBody.innerHTML = '';
+
+            // Cria cada linha da tabela de classificação com base nos dados dos usuários
+            usuarios.forEach((usuario, index) => {
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${usuario.equipe}</td>
+                        <td>${usuario.pontos}</td>
+                        <td>${usuario.vitorias}</td>
+                        <td>${usuario.empates}</td>
+                        <td>${usuario.derrotas}</td>
+                        <td>${usuario.golsMarcados}</td>
+                        <td>${usuario.golsSofridos}</td>
+                        <td>${usuario.saldoGols}</td>
+                    </tr>
+                `;
+                tabelaClassificacaoBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            // Atualiza a tabela de jogos com os usuários selecionados
+            atualizarTabelaJogos(usuarios);
+        }
+
+        // Função para atualizar a tabela de jogos com base nos usuários selecionados
+        function atualizarTabelaJogos(usuarios) {
+            const tabelaJogosBody = document.getElementById('tabelaJogosBody');
+            tabelaJogosBody.innerHTML = '';
+
+            // Exemplo simplificado para adicionar linhas na tabela de jogos
+            // Aqui você implementaria a lógica para gerar os jogos com base nos usuários selecionados
+            for (let i = 0; i < usuarios.length; i++) {
+                for (let j = i + 1; j < usuarios.length; j++) {
+                    const jogo = `
+                    <tr>
+                        <td>${usuarios[i].equipe}</td>
+                        <td>${Math.floor(Math.random() * 5)}</td>
+                        <td>${usuarios[j].equipe}</td>
+                        <td>${Math.floor(Math.random() * 5)}</td>
+                        <td>Ações</td>
+                    </tr>
+                    `;
+                    tabelaJogosBody.insertAdjacentHTML('beforeend', jogo);
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>

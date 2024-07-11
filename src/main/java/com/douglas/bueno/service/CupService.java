@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.douglas.bueno.model.Cup;
 import com.douglas.bueno.model.Jogos;
-import com.douglas.bueno.model.Participantes;
 
 @Service
 public class CupService {
@@ -16,9 +15,7 @@ public class CupService {
 	public Cup sortear(Cup cup) {
 
 		List<String> listaEquipes = new ArrayList<>();
-		for (Participantes equipes : cup.getListaParticipantes()) {
-			listaEquipes.add(equipes.getEquipe());
-		}
+		listaEquipes.addAll(cup.getUsuarios());
 
 		List<List<String>> jogosIdaVolta = sortearJogosIdaVolta(listaEquipes);
 		List<Jogos> listaJogos = new ArrayList<>();

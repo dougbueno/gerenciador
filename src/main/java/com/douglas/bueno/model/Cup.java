@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class Cup {
 
-	private String nomedoCampeonato;
-	private List<Participantes> listaParticipantes;
+	private String campeonato;
+	private List<String> usuarios;
 	private List<Jogos> listaJogos;
 
 }
