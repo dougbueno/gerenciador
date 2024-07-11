@@ -55,12 +55,13 @@
                             </select>
                         </td>
                         <td>
-                            <input type="number" class="form-control" id="golsCasa" name="golsCasa" disabled required>
+                            <input type="number" class="form-control" id="golsCasa" name="golsCasa" value="0" min="0"
+                                disabled required>
                         </td>
                         <td>X</td>
                         <td>
-                            <input type="number" class="form-control" id="golsVisitante" name="golsVisitante" disabled
-                                required>
+                            <input type="number" class="form-control" id="golsVisitante" name="golsVisitante" value="0"
+                                min="0" disabled required>
                         </td>
                         <td>
                             <select class="form-select" id="visitante" name="visitante" required>
@@ -81,11 +82,12 @@
         <table class="table" id="resultadosTable">
             <thead>
                 <tr>
-                    <th>Casa</th>
+                    <th colspan="3">Casa</th>
                     <th>Gols Casa</th>
                     <th>X</th>
                     <th>Gols Visitante</th>
-                    <th>Visitante</th>
+                    <th colspan="2">Visitante</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -158,10 +160,16 @@
         });
 
         document.getElementById('inserirResultadoBtn').addEventListener('click', function () {
+            const golsCasa = parseInt(document.getElementById('golsCasa').value);
+            const golsVisitante = parseInt(document.getElementById('golsVisitante').value);
+
+            if (golsCasa < 0 || golsVisitante < 0) {
+                alert('Os valores dos gols não podem ser menores que 0.');
+                return;
+            }
             const casa = document.getElementById('casa').value;
-            const golsCasa = document.getElementById('golsCasa').value;
             const visitante = document.getElementById('visitante').value;
-            const golsVisitante = document.getElementById('golsVisitante').value;
+
 
             const data = {
                 casa: casa,
@@ -169,6 +177,8 @@
                 visitante: visitante,
                 golsVisitante: golsVisitante
             };
+
+
 
             fetch('http://localhost:8080/api/amistoso', {
                 method: 'POST',
@@ -190,11 +200,76 @@
         });
 
         document.getElementById('finalizarAmistosoBtn').addEventListener('click', function () {
-            capturarImagemTabela();   // Captura a imagem da tabela
+
+            adicionarEstatisticasNaTabela(); // Adiciona estatísticas ao finalizar o amistoso
+            capturarImagemTabela();
             resetForm();
             localStorage.removeItem('amistoso');
             resetTabelaAmistosos(); // Limpar a tabela de resultados ao finalizar o amistoso
         });
+
+        function adicionarEstatisticasNaTabela() {
+            const resultadosTableBody = document.querySelector('#resultadosTable tbody');
+            const numJogos = resultadosTableBody.children.length;
+
+            let vitoriasCasa = 0;
+            let empates = 0;
+            let vitoriasVisitante = 0;
+            let golsFeitosCasa = 0;
+            let golsFeitosVisitante = 0;
+
+            for (let i = 0; i < numJogos; i++) {
+                const row = resultadosTableBody.children[i];
+                const golsCasa = parseInt(row.cells[1].textContent);
+                const golsVisitante = parseInt(row.cells[3].textContent);
+
+                golsFeitosCasa += golsCasa;
+                golsFeitosVisitante += golsVisitante;
+
+                if (golsCasa > golsVisitante) {
+                    vitoriasCasa++;
+                } else if (golsCasa < golsVisitante) {
+                    vitoriasVisitante++;
+                } else {
+                    empates++;
+                }
+            }
+
+            const totalJogos = numJogos;
+            const percentualVitoriasCasa = ((vitoriasCasa / totalJogos) * 100).toFixed(2);
+            const percentualEmpates = ((empates / totalJogos) * 100).toFixed(2);
+            const percentualVitoriasVisitante = ((vitoriasVisitante / totalJogos) * 100).toFixed(2);
+
+            // Criando a nova linha com as estatísticas
+            const novaLinha = `
+            <tr>
+            <td colspan="8">Estatísticas dos Amistosos</td>
+        </tr>
+        <tr>           
+            <td>VIT CASA</td>
+            <td>EMPATES</td>
+            <td>VIT VISITANTE</td>
+            <td>GF CASA</td>
+            <td>GF VISITANTE</td>
+            <td>% CASA</td>
+            <td>% EMPATE</td>
+            <td>% VISITANTE</td>
+        </tr>
+         <tr>
+            <td>${vitoriasCasa}</td>
+            <td>${empates}</td>
+            <td>${vitoriasVisitante}</td>
+            <td>${golsFeitosCasa}</td>
+            <td>${golsFeitosVisitante}</td>
+            <td>${percentualVitoriasCasa}%</td>
+            <td>${percentualEmpates}%</td>
+            <td>${percentualVitoriasVisitante}%</td>
+        </tr>
+    `;
+
+            // Inserindo a nova linha na tabela de resultados
+            resultadosTableBody.insertAdjacentHTML('beforeend', novaLinha);
+        }
 
         function resetForm() {
             document.getElementById('casa').disabled = false;
@@ -208,19 +283,19 @@
         }
 
         function resetInputs() {
-            document.getElementById('golsCasa').value = '';
-            document.getElementById('golsVisitante').value = '';
+            document.getElementById('golsCasa').value = 0;
+            document.getElementById('golsVisitante').value = 0;
         }
 
         function adicionarResultadoNaTabela(data) {
             const resultadosTableBody = document.querySelector('#resultadosTable tbody');
             const row = `
                 <tr>
-                    <td>${data.casa}</td>
+                    <td  colspan="3">${data.casa}</td>
                     <td>${data.golsCasa}</td>
                     <td>X</td>
                     <td>${data.golsVisitante}</td>
-                    <td>${data.visitante}</td>
+                    <td  colspan="2">${data.visitante}</td>
                 </tr>
             `;
             resultadosTableBody.insertAdjacentHTML('beforeend', row);
@@ -246,11 +321,14 @@
                 document.getElementById('visitante').value = amistoso.visitante;
                 document.getElementById('casa').disabled = true;
                 document.getElementById('visitante').disabled = true;
-                document.getElementById('golsCasa').disabled = false;
-                document.getElementById('golsVisitante').disabled = false;
+                document.getElementById('golsCasa').value = 0;
+                document.getElementById('golsVisitante').value = 0;
                 document.getElementById('iniciarAmistosoBtn').disabled = true;
                 document.getElementById('inserirResultadoBtn').disabled = false;
                 document.getElementById('finalizarAmistosoBtn').disabled = false;
+            } else {
+                document.getElementById('golsCasa').value = 0;
+                document.getElementById('golsVisitante').value = 0;
             }
         }
 
