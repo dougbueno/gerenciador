@@ -1,6 +1,9 @@
 package com.douglas.bueno.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +22,11 @@ public class AmistosoController {
 	@PostMapping
 	public Amistoso createCampeonatos(@RequestBody Amistoso amistoso) {
 		return amistosoRepository.save(amistoso);
+	}
+	
+	@GetMapping
+	public List<Amistoso> createAmistoso() {
+		return amistosoRepository.findAll();
 	}
 
 }
