@@ -24,6 +24,7 @@ import com.douglas.bueno.repository.HistoricoResultadosRepository;
 @RestController
 @RequestMapping("/api/historico")
 public class HistoricoResultadosController {
+	
 	@Autowired
 	private HistoricoResultadosRepository historicoRepository;
 
@@ -62,9 +63,12 @@ public class HistoricoResultadosController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> deleteCampeonatos(@RequestBody List<HistoricoResultados> historicoResultados) {
-
+	public ResponseEntity<?> insereResultados(@RequestBody List<HistoricoResultados> historicoResultados) {
+		Integer ordem = historicoRepository.findMaxOrdemHistoricoByCampeonato(historicoResultados.get(0).getCampeonato());
+		ordem = ordem +1;
+		
 		for (HistoricoResultados historico : historicoResultados) {
+			historico.setOrdem(Long.valueOf(ordem));
 			historicoRepository.save(historico);
 		}
 

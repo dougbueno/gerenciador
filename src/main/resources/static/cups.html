@@ -21,7 +21,6 @@
         th,
         td {
             text-align: center;
-            /* Centraliza o conteúdo do card-body */
         }
     </style>
 </head>
@@ -86,18 +85,18 @@
                     <tbody id="tabelaJogosBody">
                     </tbody>
                 </table>
+                <button id="reiniciarCampeonato" class="btn btn-danger" style="display:none;"
+                    onclick="reiniciarCampeonato()">Reiniciar Campeonato</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Carregar campeonatos ao carregar a página
         $(document).ready(function () {
             carregarCampeonatos();
             carregarUsuarios();
         });
 
-        // Função para carregar os campeonatos disponíveis
         function carregarCampeonatos() {
             fetch('http://localhost:8080/api/campeonatos')
                 .then(response => response.json())
@@ -106,17 +105,16 @@
                     campeonatoContainer.innerHTML = '';
                     data.forEach(campeonato => {
                         const checkbox = `
-                                <div class="form-check">
-                                    <input class="form-check-input campeonato-checkbox" type="checkbox" id="campeonato-${campeonato.id}" value="${campeonato.nomeCampeonato}">
-                                    <label class="form-check-label" for="campeonato-${campeonato.id}">
-                                        ${campeonato.nomeCampeonato}
-                                    </label>
-                                </div>
-                            `;
+                            <div class="form-check">
+                                <input class="form-check-input campeonato-checkbox" type="checkbox" id="campeonato-${campeonato.id}" value="${campeonato.nomeCampeonato}">
+                                <label class="form-check-label" for="campeonato-${campeonato.id}">
+                                    ${campeonato.nomeCampeonato}
+                                </label>
+                            </div>
+                        `;
                         campeonatoContainer.insertAdjacentHTML('beforeend', checkbox);
                     });
 
-                    // Adicionar evento para desabilitar usuários ao selecionar campeonato
                     const campeonatoCheckboxes = document.querySelectorAll('.campeonato-checkbox');
                     campeonatoCheckboxes.forEach(checkbox => {
                         checkbox.addEventListener('change', function () {
@@ -131,7 +129,6 @@
                 .catch(error => console.error('Erro ao carregar Campeonatos:', error));
         }
 
-        // Função para desabilitar checkboxes de usuários
         function desabilitarCampeonatos() {
             const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
@@ -139,7 +136,6 @@
             });
         }
 
-        // Função para habilitar checkboxes de usuários
         function habilitarCampeonatos() {
             const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
@@ -147,7 +143,6 @@
             });
         }
 
-        // Função para carregar os usuários disponíveis
         function carregarUsuarios() {
             fetch('http://localhost:8080/api/usuarios')
                 .then(response => response.json())
@@ -157,13 +152,13 @@
 
                     data.forEach(usuario => {
                         const checkbox = `
-                                <div class="form-check">
-                                    <input class="form-check-input usuario-checkbox" type="checkbox" id="usuario-${usuario.id}" value="${usuario.equipe}">
-                                    <label class="form-check-label" for="usuario-${usuario.id}">
-                                        ${usuario.nome}
-                                    </label>
-                                </div>
-                            `;
+                            <div class="form-check">
+                                <input class="form-check-input usuario-checkbox" type="checkbox" id="usuario-${usuario.id}" value="${usuario.equipe}">
+                                <label class="form-check-label" for="usuario-${usuario.id}">
+                                    ${usuario.nome}
+                                </label>
+                            </div>
+                        `;
                         usuariosContainer.insertAdjacentHTML('beforeend', checkbox);
                     });
                 })
@@ -185,16 +180,12 @@
                 return;
             }
 
-            // Desabilita o botão de submit após submeter o formulário
             document.getElementById('submitBtn').disabled = true;
 
-            // Atualiza o título da página com o nome do campeonato selecionado
             document.getElementById('campeonatoSelecionado').textContent = `Tabela de Classificação - ${campeonatoSelecionado.value}`;
 
-            // Criar o campeonato com os usuários selecionados
             criarTabelaClassificacao(campeonatoSelecionado.value, usuariosSelecionados);
 
-            // Desabilitar checkboxes de usuários após criar o campeonato
             desabilitarUsuarios();
         });
 
@@ -205,7 +196,6 @@
             });
         }
 
-        // Função para obter o campeonato selecionado
         function obterCampeonatoSelecionado() {
             const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
             for (let i = 0; i < checkboxes.length; i++) {
@@ -216,15 +206,15 @@
             return null;
         }
 
-        // Função para obter os usuários selecionados
         function obterUsuariosSelecionados() {
             const usuariosSelecionados = [];
             const checkboxes = document.querySelectorAll('#usuariosContainer input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     usuariosSelecionados.push({
+                        usuario: checkbox.id.split('-')[1], // Assuming id is in the format "usuario-{id}"
                         equipe: checkbox.value,
-                        pontos: 0, // Definir pontos inicialmente como 0
+                        pontos: 0,
                         vitorias: 0,
                         empates: 0,
                         derrotas: 0,
@@ -237,12 +227,10 @@
             return usuariosSelecionados;
         }
 
-        // Função para criar a tabela de classificação com base nos usuários selecionados
         function criarTabelaClassificacao(campeonato, usuarios) {
             const tabelaClassificacaoBody = document.getElementById('tabelaClassificacaoBody');
             tabelaClassificacaoBody.innerHTML = '';
 
-            // Cria cada linha da tabela de classificação com base nos dados dos usuários
             usuarios.forEach((usuario, index) => {
                 const row = `
                     <tr>
@@ -260,194 +248,115 @@
                 tabelaClassificacaoBody.insertAdjacentHTML('beforeend', row);
             });
 
-            // Atualiza a tabela de jogos com os usuários selecionados
-            atualizarTabelaJogos(usuarios);
-        }
-
-        // Função para atualizar a tabela de jogos com base nos usuários selecionados
-        // Função para atualizar a tabela de jogos com base nos usuários selecionados
-        function atualizarTabelaJogos(usuarios) {
             const tabelaJogosBody = document.getElementById('tabelaJogosBody');
             tabelaJogosBody.innerHTML = '';
 
-            // Gerar jogos de ida e volta entre todos os usuários selecionados
-            const jogos = gerarJogos(usuarios);
-
-            // Embaralha os jogos
-            shuffleArray(jogos);
-
-            // Adiciona as linhas na tabela de jogos
-            jogos.forEach(jogo => {
-                const row = `
-            <tr>
-                <td>${jogo.timeCasa}</td>
-                <td><input  class="form-control" type="number" id="golsCasa-${jogo.timeCasa}-${jogo.timeVisitante}" min="0" value="0"></td>
-                <td>X</td>
-                <td><input  class="form-control" type="number" id="golsVisitante-${jogo.timeCasa}-${jogo.timeVisitante}" min="0" value="0"></td>
-                <td>${jogo.timeVisitante}</td>
-                <td>
-                    <button id="btn-${jogo.timeCasa}-${jogo.timeVisitante}" class="btn btn-primary" onclick="inserirResultado('${jogo.timeCasa}', '${jogo.timeVisitante}')">Inserir</button>
-                </td>
-            </tr>
-        `;
-                tabelaJogosBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
-
-        // Função para embaralhar um array usando o algoritmo Fisher-Yates (Knuth)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        // Função para gerar jogos de ida e volta entre todos os usuários selecionados
-        function gerarJogos(usuarios) {
+            const numUsuarios = usuarios.length;
             const jogos = [];
 
-            for (let i = 0; i < usuarios.length; i++) {
-                for (let j = i + 1; j < usuarios.length; j++) {
-                    // Gerar jogos de ida
-                    const jogoIda = {
-                        timeCasa: usuarios[i].equipe,
-                        timeVisitante: usuarios[j].equipe,
-                        golsCasa: 0,
-                        golsVisitante: 0
-                    };
-                    jogos.push(jogoIda);
-
-                    // Gerar jogos de volta
-                    const jogoVolta = {
-                        timeCasa: usuarios[j].equipe,
-                        timeVisitante: usuarios[i].equipe,
-                        golsCasa: 0,
-                        golsVisitante: 0
-                    };
-                    jogos.push(jogoVolta);
+            for (let i = 0; i < numUsuarios; i++) {
+                for (let j = i + 1; j < numUsuarios; j++) {
+                    jogos.push({ timeCasa: usuarios[i], timeVisitante: usuarios[j], golsCasa: null, golsVisitante: null });
+                    jogos.push({ timeCasa: usuarios[j], timeVisitante: usuarios[i], golsCasa: null, golsVisitante: null });
                 }
             }
 
-            return jogos;
-        }
+            jogos.forEach((jogo, index) => {
+                const row = `
+                    <tr data-index="${index}">
+                        <td>${jogo.timeCasa.equipe}</td>
+                        <td><input type="number" class="form-control form-control-sm gol-casa" data-index="${index}" value="0" min="0"></td>
+                        <td>vs</td>
+                        <td><input type="number" class="form-control form-control-sm gol-visitante" data-index="${index}" value="0" min="0"></td>
+                        <td>${jogo.timeVisitante.equipe}</td>
+                        <td><button class="btn btn-primary btn-sm salvar-resultado" data-index="${index}">Salvar</button></td>
+                    </tr>
+                `;
+                tabelaJogosBody.insertAdjacentHTML('beforeend', row);
+            });
 
-        // Função para inserir o resultado do jogo na tabela de classificação
-        function inserirResultado(timeCasa, timeVisitante) {
-            // Desabilita o botão de inserir resultado após o clique
-            const btnId = `btn-${timeCasa}-${timeVisitante}`;
-            const btnInserir = document.getElementById(btnId);
-            btnInserir.disabled = true;
+            const salvarButtons = document.querySelectorAll('.salvar-resultado');
+            salvarButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const index = this.getAttribute('data-index');
+                    const golsCasaInput = document.querySelector(`.gol-casa[data-index="${index}"]`);
+                    const golsVisitanteInput = document.querySelector(`.gol-visitante[data-index="${index}"]`);
 
-            const golsCasaInput = document.getElementById(`golsCasa-${timeCasa}-${timeVisitante}`);
-            const golsVisitanteInput = document.getElementById(`golsVisitante-${timeCasa}-${timeVisitante}`);
+                    const golsCasa = parseInt(golsCasaInput.value);
+                    const golsVisitante = parseInt(golsVisitanteInput.value);
 
-            const golsCasa = parseInt(golsCasaInput.value);
-            const golsVisitante = parseInt(golsVisitanteInput.value);
+                    if (isNaN(golsCasa) || isNaN(golsVisitante)) {
+                        alert('Por favor, insira os gols para ambas as equipes.');
+                        return;
+                    }
 
-            if (isNaN(golsCasa) || isNaN(golsVisitante) || golsCasa < 0 || golsVisitante < 0) {
-                alert('Os gols devem ser números inteiros positivos ou zero.');
-                btnInserir.disabled = false; // Habilita o botão em caso de erro
-                return;
-            }
+                    jogos[index].golsCasa = golsCasa;
+                    jogos[index].golsVisitante = golsVisitante;
 
-            const tabelaClassificacaoBody = document.getElementById('tabelaClassificacaoBody');
-            const usuarios = [];
+                    atualizarTabelaClassificacao(usuarios, jogos);
 
-            tabelaClassificacaoBody.querySelectorAll('tr').forEach(row => {
-                const nome = row.cells[1].textContent;
-                const pontos = parseInt(row.cells[2].textContent);
-                const vitorias = parseInt(row.cells[3].textContent);
-                const empates = parseInt(row.cells[4].textContent);
-                const derrotas = parseInt(row.cells[5].textContent);
-                const golsMarcados = parseInt(row.cells[6].textContent);
-                const golsSofridos = parseInt(row.cells[7].textContent);
-                const saldoGols = parseInt(row.cells[8].textContent);
+                    golsCasaInput.disabled = true;
+                    golsVisitanteInput.disabled = true;
+                    this.disabled = true;
 
-                usuarios.push({
-                    equipe: nome,
-                    pontos: pontos,
-                    vitorias: vitorias,
-                    empates: empates,
-                    derrotas: derrotas,
-                    golsMarcados: golsMarcados,
-                    golsSofridos: golsSofridos,
-                    saldoGols: saldoGols
+                    if (todosJogosFinalizados(jogos)) {
+                        alert(`O campeonato acabou!`);
+                        document.getElementById('reiniciarCampeonato').style.display = 'block';
+
+                        enviarDadosCampeao(usuarios);
+                        enviarDadosHistorico(usuarios);
+                    }
                 });
             });
-
-            // Atualiza os dados na tabela de classificação
-            const jogoAtualizado = atualizarJogoNaTabela(timeCasa, golsCasa, timeVisitante, golsVisitante, usuarios);
-            atualizarTabelaClassificacao(usuarios);
-
-            // Verificar se houve vencedor ou empate
-            if (golsCasa > golsVisitante) {
-                alert(`${timeCasa} venceu o jogo contra ${timeVisitante} por ${golsCasa} a ${golsVisitante}`);
-            } else if (golsVisitante > golsCasa) {
-                alert(`${timeVisitante} venceu o jogo contra ${timeCasa} por ${golsVisitante} a ${golsCasa}`);
-            } else {
-                alert(`O jogo entre ${timeCasa} e ${timeVisitante} terminou em empate ${golsCasa} a ${golsVisitante}`);
-            }
-
-            // Após concluir o processo, você pode optar por habilitar novamente os botões se necessário
-            // btnInserir.disabled = false; // Habilita o botão após o processo ser completado
         }
 
-        // Função para atualizar os dados do jogo na tabela de classificação
-        function atualizarJogoNaTabela(timeCasa, golsCasa, timeVisitante, golsVisitante, usuarios) {
+        function atualizarTabelaClassificacao(usuarios, jogos) {
             usuarios.forEach(usuario => {
-                if (usuario.equipe === timeCasa) {
-                    usuario.golsMarcados += golsCasa;
-                    usuario.golsSofridos += golsVisitante;
-                    usuario.saldoGols += (golsCasa - golsVisitante);
+                usuario.pontos = 0;
+                usuario.vitorias = 0;
+                usuario.empates = 0;
+                usuario.derrotas = 0;
+                usuario.golsMarcados = 0;
+                usuario.golsSofridos = 0;
+                usuario.saldoGols = 0;
+            });
 
-                    if (golsCasa > golsVisitante) {
-                        usuario.pontos += 3;
-                        usuario.vitorias++;
-                    } else if (golsCasa === golsVisitante) {
-                        usuario.pontos += 1;
-                        usuario.empates++;
+            jogos.forEach(jogo => {
+                if (jogo.golsCasa !== null && jogo.golsVisitante !== null) {
+                    const timeCasa = usuarios.find(usuario => usuario.equipe === jogo.timeCasa.equipe);
+                    const timeVisitante = usuarios.find(usuario => usuario.equipe === jogo.timeVisitante.equipe);
+
+                    if (jogo.golsCasa > jogo.golsVisitante) {
+                        timeCasa.pontos += 3;
+                        timeCasa.vitorias += 1;
+                        timeVisitante.derrotas += 1;
+                    } else if (jogo.golsCasa < jogo.golsVisitante) {
+                        timeVisitante.pontos += 3;
+                        timeVisitante.vitorias += 1;
+                        timeCasa.derrotas += 1;
                     } else {
-                        usuario.derrotas++;
+                        timeCasa.pontos += 1;
+                        timeCasa.empates += 1;
+                        timeVisitante.pontos += 1;
+                        timeVisitante.empates += 1;
                     }
-                }
 
-                if (usuario.equipe === timeVisitante) {
-                    usuario.golsMarcados += golsVisitante;
-                    usuario.golsSofridos += golsCasa;
-                    usuario.saldoGols += (golsVisitante - golsCasa);
-
-                    if (golsVisitante > golsCasa) {
-                        usuario.pontos += 3;
-                        usuario.vitorias++;
-                    } else if (golsVisitante === golsCasa) {
-                        usuario.pontos += 1;
-                        usuario.empates++;
-                    } else {
-                        usuario.derrotas++;
-                    }
+                    timeCasa.golsMarcados += jogo.golsCasa;
+                    timeCasa.golsSofridos += jogo.golsVisitante;
+                    timeVisitante.golsMarcados += jogo.golsVisitante;
+                    timeVisitante.golsSofridos += jogo.golsCasa;
                 }
             });
 
-            return usuarios;
-        }
+            usuarios.forEach(usuario => {
+                usuario.saldoGols = usuario.golsMarcados - usuario.golsSofridos;
+            });
 
-        // Função para atualizar a tabela de classificação com base nos usuários
-        function atualizarTabelaClassificacao(usuarios) {
+            usuarios.sort((a, b) => b.pontos - a.pontos || b.saldoGols - a.saldoGols || b.golsMarcados - a.golsMarcados);
+
             const tabelaClassificacaoBody = document.getElementById('tabelaClassificacaoBody');
             tabelaClassificacaoBody.innerHTML = '';
 
-            // Ordenar usuários por pontos, vitorias, saldo de gols (como critério secundário)
-            usuarios.sort((a, b) => {
-                if (a.pontos !== b.pontos) {
-                    return b.pontos - a.pontos;
-                } else if (a.vitorias !== b.vitorias) {
-                    return b.vitorias - a.vitorias;
-                } else {
-                    return b.saldoGols - a.saldoGols;
-                }
-            });
-
-            // Cria cada linha da tabela de classificação com base nos dados dos usuários
             usuarios.forEach((usuario, index) => {
                 const row = `
                     <tr>
@@ -463,6 +372,76 @@
                     </tr>
                 `;
                 tabelaClassificacaoBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        function todosJogosFinalizados(jogos) {
+            return jogos.every(jogo => jogo.golsCasa !== null && jogo.golsVisitante !== null);
+        }
+
+        function reiniciarCampeonato() {
+            document.getElementById('tabelaClassificacaoBody').innerHTML = '';
+            document.getElementById('tabelaJogosBody').innerHTML = '';
+            habilitarCampeonatos();
+            habilitarUsuarios();
+            document.getElementById('campeonatoSelecionado').textContent = '';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('reiniciarCampeonato').style.display = 'none';
+        }
+
+        function enviarDadosCampeao(usuarios) {
+            const campeao = usuarios[0];
+            const dadosCampeao = {
+                campeonato: document.getElementById('campeonatoSelecionado').textContent.replace('Tabela de Classificação - ', ''),
+                usuario: campeao.usuario,
+                equipe: campeao.equipe,
+                ano: new Date().getFullYear()
+            };
+
+            fetch('http://localhost:8080/api/titulos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosCampeao)
+            })
+                .then(response => response.json())
+                .then(data => console.log('Dados do campeão enviados com sucesso:', data))
+                .catch(error => console.error('Erro ao enviar dados do campeão:', error));
+        }
+
+        function enviarDadosHistorico(usuarios) {
+            const campeonato = document.getElementById('campeonatoSelecionado').textContent.replace('Tabela de Classificação - ', '');
+            const dadosHistorico = usuarios.map(usuario => ({
+                usuario: usuario.usuario,
+                equipe: usuario.equipe,
+                campeonato: campeonato,
+                pontos: usuario.pontos,
+                vitorias: usuario.vitorias,
+                empate: usuario.empates,
+                derrotas: usuario.derrotas,
+                golsMarcados: usuario.golsMarcados,
+                golsSofridos: usuario.golsSofridos,
+                saldoGol: usuario.saldoGols
+            }));
+
+            fetch('http://localhost:8080/api/historico', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosHistorico)
+            })
+                .then(response => response.json())
+                .then(data => console.log('Dados do histórico enviados com sucesso:', data))
+                .catch(error => console.error('Erro ao enviar dados do histórico:', error));
+        }
+
+        function habilitarUsuarios() {
+            const checkboxes = document.querySelectorAll('#usuariosContainer input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = false;
+                checkbox.checked = false;
             });
         }
     </script>
