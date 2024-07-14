@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,10 +33,9 @@ public class TitulosController {
 
 	@GetMapping("/listaCampeoes")
 	public List<UsuarioTitulosDTO> findOrderByMaxTitulos() {
-		List<Object[]> resultados =  titulosRepository.findOrderByMaxTitulos();
-		return resultados.stream()
-        .map(row -> new UsuarioTitulosDTO((String) row[0], (Long) row[1]))
-        .collect(Collectors.toList());
+		List<Object[]> resultados = titulosRepository.findOrderByMaxTitulos();
+		return resultados.stream().map(row -> new UsuarioTitulosDTO((String) row[0], (Long) row[1]))
+				.collect(Collectors.toList());
 	}
 
 	@PostMapping

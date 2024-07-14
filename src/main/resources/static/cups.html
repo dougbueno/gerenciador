@@ -153,8 +153,8 @@
                     data.forEach(usuario => {
                         const checkbox = `
                             <div class="form-check">
-                                <input class="form-check-input usuario-checkbox" type="checkbox" id="usuario-${usuario.id}" value="${usuario.equipe}">
-                                <label class="form-check-label" for="usuario-${usuario.id}">
+                                <input class="form-check-input usuario-checkbox" type="checkbox" id="usuario-${usuario.equipe}" value="${usuario.equipe}">
+                                <label class="form-check-label" for="usuario-${usuario.nome}">
                                     ${usuario.nome}
                                 </label>
                             </div>
@@ -212,7 +212,7 @@
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     usuariosSelecionados.push({
-                        usuario: checkbox.id.split('-')[1], // Assuming id is in the format "usuario-{id}"
+                        usuario: checkbox.id.split('-')[1],
                         equipe: checkbox.value,
                         pontos: 0,
                         vitorias: 0,
@@ -393,10 +393,11 @@
             const campeao = usuarios[0];
             const dadosCampeao = {
                 campeonato: document.getElementById('campeonatoSelecionado').textContent.replace('Tabela de Classificação - ', ''),
-                usuario: campeao.usuario,
+                usuario: campeao.nome,
                 equipe: campeao.equipe,
                 ano: new Date().getFullYear()
             };
+            console.log('Dados do campeão:', dadosCampeao);
 
             fetch('http://localhost:8080/api/titulos', {
                 method: 'POST',
@@ -424,6 +425,8 @@
                 golsSofridos: usuario.golsSofridos,
                 saldoGol: usuario.saldoGols
             }));
+            console.log('Dados do histórico:', dadosHistorico);
+
 
             fetch('http://localhost:8080/api/historico', {
                 method: 'POST',
