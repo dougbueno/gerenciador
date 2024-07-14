@@ -64,7 +64,7 @@
                         data.forEach(equipe => {
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
-                                <td><img src="/imagens/${equipe.nomeEquipe}.png" alt=" ${equipe.nomeEquipe}"></td>
+                                <td>${equipe.nomeEquipe}</td>
                                 <td>
                                     <button class="btn btn-outline-primary btn-sm" onclick="editarEquipe(${equipe.id})">Editar</button>
                                     <button class="btn btn-outline-danger btn-sm" onclick="excluirEquipe(${equipe.id})">Excluir</button>

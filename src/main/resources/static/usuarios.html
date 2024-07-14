@@ -70,23 +70,35 @@
             function carregarEquipes() {
                 fetch('http://localhost:8080/api/equipes/')
                     .then(response => response.json())
-                    .then(data => {
-                        const selectEquipe = document.getElementById('equipe');
-                        selectEquipe.innerHTML = ''; // Limpa o conteúdo atual do select
+                    .then(dataEquipes => {
+                        fetch('http://localhost:8080/api/usuarios/')
+                            .then(response => response.json())
+                            .then(dataUsuarios => {
+                                const selectEquipe = document.getElementById('equipe');
+                                selectEquipe.innerHTML = ''; // Limpa o conteúdo atual do select
 
-                        const defaultOption = document.createElement('option');
-                        defaultOption.value = '';
-                        defaultOption.textContent = 'Selecione uma equipe';
-                        defaultOption.disabled = true;
-                        defaultOption.selected = true;
-                        selectEquipe.appendChild(defaultOption);
+                                const defaultOption = document.createElement('option');
+                                defaultOption.value = '';
+                                defaultOption.textContent = 'Selecione uma equipe';
+                                defaultOption.disabled = true;
+                                defaultOption.selected = true;
+                                selectEquipe.appendChild(defaultOption);
 
-                        data.forEach(equipe => {
-                            const option = document.createElement('option');
-                            option.value = equipe.nomeEquipe;
-                            option.textContent = equipe.nomeEquipe;
-                            selectEquipe.appendChild(option);
-                        });
+                                dataEquipes.forEach(equipe => {
+                                    const option = document.createElement('option');
+                                    option.value = equipe.nomeEquipe;
+                                    option.textContent = equipe.nomeEquipe;
+
+                                    // Verifica se a equipe está alocada a algum usuário
+                                    const isAlocada = dataUsuarios.some(usuario => usuario.equipe === equipe.nomeEquipe);
+                                    if (isAlocada) {
+                                        option.disabled = true; // Desabilita a equipe se já estiver alocada
+                                    }
+
+                                    selectEquipe.appendChild(option);
+                                });
+                            })
+                            .catch(error => console.error('Erro ao carregar usuários:', error));
                     })
                     .catch(error => console.error('Erro ao carregar equipes:', error));
             }

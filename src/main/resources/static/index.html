@@ -20,13 +20,45 @@
             text-align: center;
             /* Centraliza o conteúdo do card-body */
         }
+
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            /* Permite que as imagens quebrem linha se necessário */
+            gap: 10px;
+            /* Espaçamento opcional entre as imagens */
+        }
+
+        .image-container .col-md-1 {
+            flex: 0 0 auto;
+            /* Garante que os col-md-1 não encolham nem cresçam */
+            width: 100px;
+            /* Define uma largura fixa */
+        }
+
+        .image-container img {
+            max-width: 100%;
+            /* Ajusta a largura da imagem para 100% do contêiner pai */
+            height: auto;
+            /* Mantém a proporção da imagem */
+        }
+
+        .image-container .col-md-2 {
+            flex: 0 0 auto;
+            /* Não permite que as colunas encolham */
+            max-width: 16.666%;
+            /* Define a largura para 1/6 do container (para 6 colunas por linha) */
+            padding: 0 5px;
+            /* Espaçamento opcional entre as colunas */
+            box-sizing: border-box;
+            /* Garante que o padding não aumente a largura */
+        }
     </style>
 </head>
 
 <body>
     <div id="header"></div> <!-- Div onde o cabeçalho será inserido -->
     <div class="container mt-4">
-
         <h1 class="mt-4">Bem-vindo ao Portal dos Campeonatos</h1>
 
         <!-- Seção de Campeonatos Atuais -->
@@ -35,11 +67,13 @@
             <div id="campeonatos" class="row"></div>
         </div>
 
+        <!-- Seção de Equipes -->
         <div class="my-4">
             <h2>Equipes</h2>
             <div id="equipes" class="row"></div>
         </div>
 
+        <!-- Seção de Usuários -->
         <div class="my-4">
             <h2>Usuários</h2>
             <div id="usuarios" class="row"></div>
@@ -171,8 +205,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
 
@@ -192,15 +224,15 @@
                         data.forEach(campeonato => {
                             const campeonatoCard = `
                                  <div class="col-md-2">
-                                          <img src="/imagens/${campeonato.nomeCampeonato}.png" alt="${campeonato.nomeCampeonato}">
-                                 <p></p>
-                                </div>`;
+                                    <img src="/imagens/${campeonato.nomeCampeonato}.png" alt="${campeonato.nomeCampeonato}">
+                                 </div>`;
                             campeonatosContainer.append(campeonatoCard);
                         });
                     })
                     .catch(error => console.error('Erro ao carregar campeonatos:', error));
             }
 
+            // Função para carregar equipes
             function carregarEquipes() {
                 fetch('http://localhost:8080/api/equipes')
                     .then(response => response.json())
@@ -210,20 +242,19 @@
 
                         data.forEach(equipe => {
                             const equipeCard = `
-                    <div class="col-md-2">
-                       <img src="/imagens/${equipe.nomeEquipe}.png" alt=" ${equipe.nomeEquipe}">
-                          <p></p>
-                    </div>`;
+                          <div class="col-md-1 mb-4">
+                               <img src="/imagens/${equipe.nomeEquipe}.png" alt="${equipe.nomeEquipe}">
+                            </div>`;
                             equipesContainer.append(equipeCard);
+
                         });
                     })
                     .catch(error => console.error('Erro ao carregar equipes:', error));
             }
 
-
-
+            // Função para carregar usuários
             function carregarUsuarios() {
-                // Fetch API para buscar os dados dos campeonatos
+                // Fetch API para buscar os dados dos usuários
                 fetch('http://localhost:8080/api/usuarios')
                     .then(response => response.json())
                     .then(data => {
@@ -232,17 +263,17 @@
 
                         data.forEach(usuario => {
                             const usuarioCard = `
-                                 <div class="col-md-2">
+                                <div class="col-md-2 mb-4">
                                     <div class="card">
                                         <div class="card-body">
                                             ${usuario.nome}
                                         </div>
-                                    </div><p></p>
+                                    </div>
                                 </div>`;
                             usuarioContainer.append(usuarioCard);
                         });
                     })
-                    .catch(error => console.error('Erro ao carregar usuarios:', error));
+                    .catch(error => console.error('Erro ao carregar usuários:', error));
             }
 
             // Função para carregar estatísticas gerais
