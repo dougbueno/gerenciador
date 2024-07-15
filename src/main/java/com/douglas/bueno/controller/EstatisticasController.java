@@ -10,13 +10,13 @@ import com.douglas.bueno.model.Estatisticas;
 import com.douglas.bueno.service.EstatisticasService;
 
 @RestController
-@RequestMapping("/api/estatisticas")
+@RequestMapping("/api")
 public class EstatisticasController {
 
 	@Autowired
 	private EstatisticasService estatisticasService;
 
-	@GetMapping
+	@GetMapping("/estatisticas")
 	public ResponseEntity<Estatisticas> obterEstatisticas() {
 
 		return ResponseEntity.ok(estatisticasService.obterEstatisticas());
