@@ -165,18 +165,19 @@
             }
             const casa = document.getElementById('casa').value;
             const visitante = document.getElementById('visitante').value;
-
+            const campeonato = "Amistoso";
 
             const data = {
                 casa: casa,
                 golsCasa: golsCasa,
                 visitante: visitante,
-                golsVisitante: golsVisitante
+                golsVisitante: golsVisitante,
+                campeonato: campeonato
             };
 
 
 
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso', {
+            fetch('http://localhost:8080/api/jogos/amistoso', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -285,18 +286,26 @@
 
         function adicionarResultadoNaTabela(data) {
             const resultadosTableBody = document.querySelector('#resultadosTable tbody');
-            const row = `
-                <tr>
-                    <td  colspan="3">${data.casa}</td>
-                    <td>${data.golsCasa}</td>
-                    <td>X</td>
-                    <td>${data.golsVisitante}</td>
-                    <td  colspan="2">${data.visitante}</td>
-                </tr>
-            `;
-            resultadosTableBody.insertAdjacentHTML('beforeend', row);
-        }
+            resultadosTableBody.innerHTML = ''; // Limpa o conteúdo atual da tabela
 
+            fetch('http://localhost:8080/api/jogos/amistoso')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(jogo => {
+                        const row = `
+                    <tr>
+                        <td colspan="3">${jogo.casa}</td>
+                        <td>${jogo.golsCasa}</td>
+                        <td>X</td>
+                        <td>${jogo.golsVisitante}</td>
+                        <td colspan="2">${jogo.visitante}</td>
+                    </tr>
+                `;
+                        resultadosTableBody.insertAdjacentHTML('beforeend', row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar resultados:', error));
+        }
         function salvarAmistoso() {
             const casa = document.getElementById('casa').value;
             const visitante = document.getElementById('visitante').value;
