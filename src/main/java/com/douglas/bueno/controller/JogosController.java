@@ -36,19 +36,12 @@ public class JogosController {
 	public ResponseEntity<List<Jogos>> recuperaTodosJogosAmistoso() {
 		List<Jogos> jogosAtivos = amistosoRepository.findAllByAtivoOrderByDataAmistosoAsc(true);
 
-		if (jogosAtivos.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(jogosAtivos);
 	}
 
 	@PutMapping("/amistoso/atualizar")
 	public ResponseEntity<?> recuperaTodosJogosAmistosoAtualizar() {
 		List<Jogos> jogosAtivos = amistosoRepository.findAllByAtivoOrderByDataAmistosoAsc(true);
-
-		if (jogosAtivos.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
 
 		amistosoService.atualizarAtivos(jogosAtivos);
 

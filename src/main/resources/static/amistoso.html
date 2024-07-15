@@ -1,5 +1,5 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 
 <head>
     <script src="./assets/js/color-modes.js"></script>
@@ -18,18 +18,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
-        select,
         th,
         td {
             text-align: center;
-            /* Centraliza o conteúdo do card-body */
+        }
+
+        .disabled-select {
+            pointer-events: none;
+            background-color: #e9ecef;
         }
     </style>
 </head>
 
 <body>
-
-    <div id="header"></div> <!-- Div where the header will be inserted -->
+    <div id="header"></div> <!-- Div onde o cabeçalho será inserido -->
     <div class="container mt-5">
         <h1 class="mb-4">Registrar Amistoso</h1>
         <form id="amistosoForm">
@@ -46,28 +48,23 @@
                 <tbody>
                     <tr>
                         <td>
-                            <select class="form-select" id="casa" name="casa" required>
-                                <option value="">Selecione um usuário</option>
-                            </select>
+                            <div id="casaContainer"></div>
                         </td>
                         <td>
                             <input type="number" class="form-control" id="golsCasa" name="golsCasa" value="0" min="0"
-                                disabled required>
+                                required>
                         </td>
                         <td>X</td>
                         <td>
                             <input type="number" class="form-control" id="golsVisitante" name="golsVisitante" value="0"
-                                min="0" disabled required>
+                                min="0" required>
                         </td>
                         <td>
-                            <select class="form-select" id="visitante" name="visitante" required>
-                                <option value="">Selecione um usuário</option>
-                            </select>
+                            <div id="visitanteContainer"></div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <button type="button" class="btn btn-primary" id="iniciarAmistosoBtn">Iniciar Amistoso</button>
             <button type="button" class="btn btn-success" id="inserirResultadoBtn" disabled>Inserir Resultado</button>
             <button type="button" class="btn btn-danger" id="finalizarAmistosoBtn" disabled>Finalizar Amistoso</button>
         </form>
@@ -78,12 +75,11 @@
         <table class="table" id="resultadosTable">
             <thead>
                 <tr>
-                    <th colspan="3">Casa</th>
+                    <th>Casa</th>
                     <th>Gols Casa</th>
                     <th>X</th>
                     <th>Gols Visitante</th>
-                    <th colspan="2">Visitante</th>
-
+                    <th>Visitante</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,264 +90,269 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const casaSelect = document.getElementById('casa');
-            const visitanteSelect = document.getElementById('visitante');
-            const iniciarAmistosoBtn = document.getElementById('iniciarAmistosoBtn');
+            adicionarResultadoNaTabela();
 
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
+            const casaContainer = document.getElementById('casaContainer');
+            const visitanteContainer = document.getElementById('visitanteContainer');
+            const inserirResultadoBtn = document.getElementById('inserirResultadoBtn');
+            const finalizarAmistosoBtn = document.getElementById('finalizarAmistosoBtn');
+
+            fetch('http://localhost:8080/api/usuarios')
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(usuario => {
-                        const option = document.createElement('option');
-                        option.value = usuario.nome;
-                        option.textContent = usuario.nome;
-                        casaSelect.appendChild(option);
-                        const optionClone = option.cloneNode(true);
-                        visitanteSelect.appendChild(optionClone);
-                    });
+                        const casaCheckbox = document.createElement('input');
+                        casaCheckbox.type = 'checkbox';
+                        casaCheckbox.id = 'casa_' + usuario.nome;
+                        casaCheckbox.name = 'casa';
+                        casaCheckbox.value = usuario.nome;
+                        casaCheckbox.addEventListener('change', function () {
+                            desabilitarOutrosCheckboxes(casaCheckbox, casaContainer);
+                            validarSelecaoUsuarios();
+                        });
 
-                    carregarAmistoso();
+                        const casaLabel = document.createElement('label');
+                        casaLabel.htmlFor = casaCheckbox.id;
+                        casaLabel.textContent = usuario.nome;
+
+                        casaContainer.appendChild(casaCheckbox);
+                        casaContainer.appendChild(casaLabel);
+                        casaContainer.appendChild(document.createElement('br'));
+
+                        const visitanteCheckbox = casaCheckbox.cloneNode();
+                        visitanteCheckbox.id = 'visitante_' + usuario.nome;
+                        visitanteCheckbox.name = 'visitante';
+                        visitanteCheckbox.addEventListener('change', function () {
+                            desabilitarOutrosCheckboxes(visitanteCheckbox, visitanteContainer);
+                            validarSelecaoUsuarios();
+                        });
+
+                        const visitanteLabel = document.createElement('label');
+                        visitanteLabel.htmlFor = visitanteCheckbox.id;
+                        visitanteLabel.textContent = usuario.nome;
+
+                        visitanteContainer.appendChild(visitanteCheckbox);
+                        visitanteContainer.appendChild(visitanteLabel);
+                        visitanteContainer.appendChild(document.createElement('br'));
+                    });
                 })
                 .catch(error => console.error('Erro ao carregar usuários:', error));
 
-            // Impedir que o mesmo usuário seja selecionado em ambos os selects
-            casaSelect.addEventListener('change', function () {
-                const selectedUser = this.value;
-                const visitanteValue = visitanteSelect.value;
-                if (selectedUser === visitanteValue) {
-                    alert('Por favor, selecione um usuário diferente para visitante.');
-                    this.selectedIndex = 0; // Reseta a seleção para o valor inicial
-                }
-                validarInicioAmistoso();
-            });
+            function desabilitarOutrosCheckboxes(selecionado, container) {
+                const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    if (checkbox !== selecionado) {
+                        checkbox.disabled = selecionado.checked;
+                    }
+                });
+            }
 
-            visitanteSelect.addEventListener('change', function () {
-                const selectedUser = this.value;
-                const casaValue = casaSelect.value;
-                if (selectedUser === casaValue) {
-                    alert('Por favor, selecione um usuário diferente para casa.');
-                    this.selectedIndex = 0; // Reseta a seleção para o valor inicial
+            function validarSelecaoUsuarios() {
+                const casaSelecionado = casaContainer.querySelector('input[type="checkbox"]:checked');
+                const visitanteSelecionado = visitanteContainer.querySelector('input[type="checkbox"]:checked');
+
+                if (casaSelecionado && visitanteSelecionado) {
+                    if (casaSelecionado.value === visitanteSelecionado.value) {
+                        alert('Por favor, selecione um usuário diferente para visitante.');
+                        visitanteSelecionado.checked = false;
+                        desabilitarOutrosCheckboxes(visitanteSelecionado, visitanteContainer);
+                    }
                 }
+
                 validarInicioAmistoso();
-            });
+            }
 
             function validarInicioAmistoso() {
-                if (casaSelect.value && visitanteSelect.value) {
-                    iniciarAmistosoBtn.disabled = false;
+                const casaSelecionado = casaContainer.querySelector('input[type="checkbox"]:checked');
+                const visitanteSelecionado = visitanteContainer.querySelector('input[type="checkbox"]:checked');
+
+                if (casaSelecionado && visitanteSelecionado && !casaSelecionado.disabled && !visitanteSelecionado.disabled) {
+                    inserirResultadoBtn.disabled = false;
                 } else {
-                    iniciarAmistosoBtn.disabled = true;
+                    inserirResultadoBtn.disabled = true;
                 }
             }
-        });
 
-        document.getElementById('iniciarAmistosoBtn').addEventListener('click', function () {
-            document.getElementById('casa').disabled = true;
-            document.getElementById('visitante').disabled = true;
-            document.getElementById('golsCasa').disabled = false;
-            document.getElementById('golsVisitante').disabled = false;
-            document.getElementById('iniciarAmistosoBtn').disabled = true;
-            document.getElementById('inserirResultadoBtn').disabled = false;
-            document.getElementById('finalizarAmistosoBtn').disabled = false;
-            salvarAmistoso();
-        });
+            inserirResultadoBtn.addEventListener('click', function () {
+                const casaSelecionado = casaContainer.querySelector('input[type="checkbox"]:checked');
+                const visitanteSelecionado = visitanteContainer.querySelector('input[type="checkbox"]:checked');
+                const golsCasa = parseInt(document.getElementById('golsCasa').value);
+                const golsVisitante = parseInt(document.getElementById('golsVisitante').value);
 
-        document.getElementById('inserirResultadoBtn').addEventListener('click', function () {
-            const golsCasa = parseInt(document.getElementById('golsCasa').value);
-            const golsVisitante = parseInt(document.getElementById('golsVisitante').value);
+                if (golsCasa < 0 || golsVisitante < 0) {
+                    alert('Os valores dos gols não podem ser menores que 0.');
+                    return;
+                }
 
-            if (golsCasa < 0 || golsVisitante < 0) {
-                alert('Os valores dos gols não podem ser menores que 0.');
-                return;
-            }
-            const casa = document.getElementById('casa').value;
-            const visitante = document.getElementById('visitante').value;
-            const campeonato = "Amistoso";
+                const data = {
+                    casa: casaSelecionado.value,
+                    golsCasa: golsCasa,
+                    visitante: visitanteSelecionado.value,
+                    golsVisitante: golsVisitante,
+                    campeonato: "Amistoso"
+                };
 
-            const data = {
-                casa: casa,
-                golsCasa: golsCasa,
-                visitante: visitante,
-                golsVisitante: golsVisitante,
-                campeonato: campeonato
-            };
-
-
-
-            fetch('http://localhost:8080/api/jogos/amistoso', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        adicionarResultadoNaTabela(data);
-                    }
-                    resetInputs();
+                fetch('http://localhost:8080/api/jogos/amistoso', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
                 })
-                .catch(error => {
-                    console.error('Erro:', error);
-                    resetInputs();
-                });
-        });
+                    .then(response => {
+                        if (response.ok) {
+                            adicionarResultadoNaTabela(data);
+                            casaSelecionado.disabled = true;
+                            visitanteSelecionado.disabled = true;
+                            finalizarAmistosoBtn.disabled = false;
+                        }
+                        resetInputs();
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        resetInputs();
+                    });
+            });
 
-        document.getElementById('finalizarAmistosoBtn').addEventListener('click', function () {
+            finalizarAmistosoBtn.addEventListener('click', function () {
+                adicionarEstatisticasNaTabela();
+                capturarImagemTabela();
+                localStorage.removeItem('amistoso');
+                atualizaStatusAtivo();
+                resetForm();
+                setTimeout(function () {
+                    location.reload();
+                }, 2000); // Tempo em milissegundos
+            });
 
-            adicionarEstatisticasNaTabela(); // Adiciona estatísticas ao finalizar o amistoso
-            capturarImagemTabela();
-            resetForm();
-            localStorage.removeItem('amistoso');
-            resetTabelaAmistosos(); // Limpar a tabela de resultados ao finalizar o amistoso
-        });
-
-        function adicionarEstatisticasNaTabela() {
-            const resultadosTableBody = document.querySelector('#resultadosTable tbody');
-            const numJogos = resultadosTableBody.children.length;
-
-            let vitoriasCasa = 0;
-            let empates = 0;
-            let vitoriasVisitante = 0;
-            let golsFeitosCasa = 0;
-            let golsFeitosVisitante = 0;
-
-            for (let i = 0; i < numJogos; i++) {
-                const row = resultadosTableBody.children[i];
-                const golsCasa = parseInt(row.cells[1].textContent);
-                const golsVisitante = parseInt(row.cells[3].textContent);
-
-                golsFeitosCasa += golsCasa;
-                golsFeitosVisitante += golsVisitante;
-
-                if (golsCasa > golsVisitante) {
-                    vitoriasCasa++;
-                } else if (golsCasa < golsVisitante) {
-                    vitoriasVisitante++;
-                } else {
-                    empates++;
-                }
+            function atualizaStatusAtivo() {
+                fetch('http://localhost:8080/api/jogos/amistoso/atualizar', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.status === 200) {
+                        console.log('Atualização bem-sucedida');
+                    } else {
+                        console.error('Erro ao atualizar status:', response.status);
+                    }
+                })
+                    .catch(error => console.error('Erro ao fazer requisição:', error));
             }
 
-            const totalJogos = numJogos;
-            const percentualVitoriasCasa = ((vitoriasCasa / totalJogos) * 100).toFixed(2);
-            const percentualEmpates = ((empates / totalJogos) * 100).toFixed(2);
-            const percentualVitoriasVisitante = ((vitoriasVisitante / totalJogos) * 100).toFixed(2);
+            function adicionarEstatisticasNaTabela() {
+                const resultadosTableBody = document.querySelector('#resultadosTable tbody');
+                const rows = resultadosTableBody.querySelectorAll('tr');
 
-            // Criando a nova linha com as estatísticas
-            const novaLinha = `
-            <tr>
-            <td colspan="8">Estatísticas dos Amistosos</td>
-        </tr>
-        <tr>           
-            <td>VIT CASA</td>
-            <td>EMPATES</td>
-            <td>VIT VISITANTE</td>
-            <td>GF CASA</td>
-            <td>GF VISITANTE</td>
-            <td>% CASA</td>
-            <td>% EMPATE</td>
-            <td>% VISITANTE</td>
-        </tr>
-         <tr>
-            <td>${vitoriasCasa}</td>
-            <td>${empates}</td>
-            <td>${vitoriasVisitante}</td>
-            <td>${golsFeitosCasa}</td>
-            <td>${golsFeitosVisitante}</td>
-            <td>${percentualVitoriasCasa}%</td>
-            <td>${percentualEmpates}%</td>
-            <td>${percentualVitoriasVisitante}%</td>
-        </tr>
-    `;
+                let vitoriasCasa = 0;
+                let vitoriasVisitante = 0;
+                let empates = 0;
+                let golsFeitosCasa = 0;
+                let golsFeitosVisitante = 0;
 
-            // Inserindo a nova linha na tabela de resultados
-            resultadosTableBody.insertAdjacentHTML('beforeend', novaLinha);
-        }
+                rows.forEach(row => {
+                    const golsCasa = parseInt(row.cells[1].textContent);
+                    const golsVisitante = parseInt(row.cells[3].textContent);
 
-        function resetForm() {
-            document.getElementById('casa').disabled = false;
-            document.getElementById('visitante').disabled = false;
-            document.getElementById('golsCasa').disabled = true;
-            document.getElementById('golsVisitante').disabled = true;
-            document.getElementById('iniciarAmistosoBtn').disabled = false;
-            document.getElementById('inserirResultadoBtn').disabled = true;
-            document.getElementById('finalizarAmistosoBtn').disabled = true;
-            document.getElementById('amistosoForm').reset();
-        }
+                    golsFeitosCasa += golsCasa;
+                    golsFeitosVisitante += golsVisitante;
 
-        function resetInputs() {
-            document.getElementById('golsCasa').value = 0;
-            document.getElementById('golsVisitante').value = 0;
-        }
+                    if (golsCasa > golsVisitante) {
+                        vitoriasCasa++;
+                    } else if (golsCasa < golsVisitante) {
+                        vitoriasVisitante++;
+                    } else {
+                        empates++;
+                    }
+                });
 
-        function adicionarResultadoNaTabela(data) {
-            const resultadosTableBody = document.querySelector('#resultadosTable tbody');
-            resultadosTableBody.innerHTML = ''; // Limpa o conteúdo atual da tabela
+                const totalJogos = rows.length;
+                const percentualVitoriasCasa = ((vitoriasCasa / totalJogos) * 100).toFixed(2);
+                const percentualVitoriasVisitante = ((vitoriasVisitante / totalJogos) * 100).toFixed(2);
+                const percentualEmpates = ((empates / totalJogos) * 100).toFixed(2);
 
-            fetch('http://localhost:8080/api/jogos/amistoso')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(jogo => {
-                        const row = `
+                const novaLinha = `
                     <tr>
-                        <td colspan="3">${jogo.casa}</td>
-                        <td>${jogo.golsCasa}</td>
-                        <td>X</td>
-                        <td>${jogo.golsVisitante}</td>
-                        <td colspan="2">${jogo.visitante}</td>
+                        <td>VIT CASA</td>
+                        <td>EMP</td>
+                        <td>VIT VISIT</td>
+                    </tr>
+                    <tr>
+                        <td>${vitoriasCasa} (${percentualVitoriasCasa}%)</td>
+                        <td>${empates} (${percentualEmpates}%)</td>
+                        <td>${vitoriasVisitante} (${percentualVitoriasVisitante}%)</td>
                     </tr>
                 `;
-                        resultadosTableBody.insertAdjacentHTML('beforeend', row);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar resultados:', error));
-        }
-        function salvarAmistoso() {
-            const casa = document.getElementById('casa').value;
-            const visitante = document.getElementById('visitante').value;
 
-            const amistoso = {
-                casa: casa,
-                visitante: visitante
-            };
-
-            localStorage.setItem('amistoso', JSON.stringify(amistoso));
-        }
-
-        function carregarAmistoso() {
-            const amistoso = JSON.parse(localStorage.getItem('amistoso'));
-
-            if (amistoso) {
-                document.getElementById('casa').value = amistoso.casa;
-                document.getElementById('visitante').value = amistoso.visitante;
-                document.getElementById('casa').disabled = true;
-                document.getElementById('visitante').disabled = true;
-                document.getElementById('golsCasa').value = 0;
-                document.getElementById('golsVisitante').value = 0;
-                document.getElementById('iniciarAmistosoBtn').disabled = true;
-                document.getElementById('inserirResultadoBtn').disabled = false;
-                document.getElementById('finalizarAmistosoBtn').disabled = false;
-            } else {
-                document.getElementById('golsCasa').value = 0;
-                document.getElementById('golsVisitante').value = 0;
+                resultadosTableBody.insertAdjacentHTML('beforeend', novaLinha);
             }
-        }
 
-        function capturarImagemTabela() {
-            const tabela = document.getElementById('resultadosTable');
-            html2canvas(tabela).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = imgData;
-                link.download = 'resultados_amistoso.png';
-                link.click();
-            });
-        }
+            function capturarImagemTabela() {
+                const resultadosTable = document.getElementById('resultadosTable');
+                html2canvas(resultadosTable).then(canvas => {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'tabela_resultados.png';
+                    link.click();
+                });
+            }
 
-        function resetTabelaAmistosos() {
-            const resultadosTableBody = document.querySelector('#resultadosTable tbody');
-            resultadosTableBody.innerHTML = ''; // Limpa todo o conteúdo da tabela
-        }
+            function resetInputs() {
+                document.getElementById('golsCasa').value = '0';
+                document.getElementById('golsVisitante').value = '0';
+            }
+
+            function resetForm() {
+                const casaCheckboxes = casaContainer.querySelectorAll('input[type="checkbox"]');
+                casaCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.disabled = false;
+                });
+
+                const visitanteCheckboxes = visitanteContainer.querySelectorAll('input[type="checkbox"]');
+                visitanteCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.disabled = false;
+                });
+
+                finalizarAmistosoBtn.disabled = true;
+                inserirResultadoBtn.disabled = true;
+            }
+
+            function adicionarResultadoNaTabela(resultado) {
+                const resultadosTableBody = document.querySelector('#resultadosTable tbody');
+
+                if (resultado) {
+                    const novaLinha = document.createElement('tr');
+                    novaLinha.innerHTML = `
+                        <td>${resultado.casa}</td>
+                        <td>${resultado.golsCasa}</td>
+                        <td>X</td>
+                        <td>${resultado.golsVisitante}</td>
+                        <td>${resultado.visitante}</td>
+                    `;
+                    resultadosTableBody.appendChild(novaLinha);
+                } else {
+                    fetch('http://localhost:8080/api/jogos/amistoso')
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(item => {
+                                const novaLinha = document.createElement('tr');
+                                novaLinha.innerHTML = `
+                                    <td>${item.casa}</td>
+                                    <td>${item.golsCasa}</td>
+                                    <td>X</td>
+                                    <td>${item.golsVisitante}</td>
+                                    <td>${item.visitante}</td>
+                                `;
+                                resultadosTableBody.appendChild(novaLinha);
+                            });
+                        })
+                        .catch(error => console.error('Erro ao carregar resultados:', error));
+                }
+            }
+        });
     </script>
 </body>
 
