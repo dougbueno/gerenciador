@@ -50,7 +50,7 @@ public class UsuarioController {
 
 		Usuarios existingUsuarios = optionalUsuarios.get();
 		existingUsuarios.setNome(usuarios.getNome());
-		existingUsuarios.setEquipe(usuarios.getEquipe());
+		existingUsuarios.setEquipe(usuarios.getEquipe() == null ? existingUsuarios.getEquipe(): usuarios.getEquipe());
 
 		Usuarios updatedusuario = usuariosRepository.save(existingUsuarios);
 		return ResponseEntity.ok(updatedusuario);

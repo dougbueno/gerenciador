@@ -27,10 +27,10 @@ public interface HistoricoResultadosRepository extends JpaRepository<HistoricoRe
 	@Query("SELECT h.usuario " + "FROM HistoricoResultados h GROUP BY h.usuario " + "ORDER BY SUM(h.golsSofridos) ASC")
 	List<String> findOneUsuarioComMenosGolsSofridos();
 
-	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.vitoria) DESC")
+	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.vitorias) DESC")
 	List<String> findOneUsuarioComMaisVitorias();
 
-	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.vitoria) ASC")
+	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.vitorias) ASC")
 	List<String> findOneUsuarioComMenosVitorias();
 
 	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.pontos) ASC")
@@ -46,10 +46,10 @@ public interface HistoricoResultadosRepository extends JpaRepository<HistoricoRe
 	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.derrotas) ASC")
 	List<String> findOneUsuarioComMenosDerrotas();
 
-	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.empate) DESC")
+	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.empates) DESC")
 	List<String> findOneUsuarioComMaisEmpates();
 
-	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.empate) ASC")
+	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.empates) ASC")
 	List<String> findOneUsuarioComMenosEmpates();
 	
 	@Query("SELECT MAX(hr.ordem) FROM HistoricoResultados hr WHERE hr.campeonato = :campeonato")

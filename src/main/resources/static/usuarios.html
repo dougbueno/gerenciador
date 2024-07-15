@@ -134,8 +134,15 @@
                     .then(data => {
                         document.getElementById('usuarioId').value = data.id;
                         document.getElementById('nome').value = data.nome;
-                        document.getElementById('equipe').value = data.equipe;
 
+                        // Encontrar a opção da equipe mesmo que desabilitada
+                        const selectEquipe = document.getElementById('equipe');
+                        const optionEquipe = [...selectEquipe.options].find(option => option.value === data.equipe);
+                        if (optionEquipe) {
+                            optionEquipe.selected = true;
+                        }
+                        this.reset(); // Limpa o formulário
+                        carregarEquipes(); // Atualiza a tabela após excluir o usuário com sucesso
                     })
                     .catch(error => console.error('Erro ao carregar usuário:', error));
             }

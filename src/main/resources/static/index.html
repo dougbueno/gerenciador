@@ -18,40 +18,23 @@
     <style>
         .card-body {
             text-align: center;
-            /* Centraliza o conteúdo do card-body */
         }
 
         .image-container {
             display: flex;
             flex-wrap: wrap;
-            /* Permite que as imagens quebrem linha se necessário */
             gap: 10px;
-            /* Espaçamento opcional entre as imagens */
         }
 
         .image-container .col-md-1 {
             flex: 0 0 auto;
-            /* Garante que os col-md-1 não encolham nem cresçam */
-            width: 100px;
-            /* Define uma largura fixa */
+            width: 11.11%;
+            padding: 5px;
         }
 
         .image-container img {
             max-width: 100%;
-            /* Ajusta a largura da imagem para 100% do contêiner pai */
             height: auto;
-            /* Mantém a proporção da imagem */
-        }
-
-        .image-container .col-md-2 {
-            flex: 0 0 auto;
-            /* Não permite que as colunas encolham */
-            max-width: 16.666%;
-            /* Define a largura para 1/6 do container (para 6 colunas por linha) */
-            padding: 0 5px;
-            /* Espaçamento opcional entre as colunas */
-            box-sizing: border-box;
-            /* Garante que o padding não aumente a largura */
         }
     </style>
 </head>
@@ -70,7 +53,7 @@
         <!-- Seção de Equipes -->
         <div class="my-4">
             <h2>Equipes</h2>
-            <div id="equipes" class="row"></div>
+            <div id="equipes" class="row image-container"></div>
         </div>
 
         <!-- Seção de Usuários -->
@@ -242,11 +225,10 @@
 
                         data.forEach(equipe => {
                             const equipeCard = `
-                          <div class="col-md-1 mb-4">
-                               <img src="/imagens/${equipe.nomeEquipe}.png" alt="${equipe.nomeEquipe}">
-                            </div>`;
+                                <div class="col-md-1 mb-4">
+                                    <img src="/imagens/${equipe.nomeEquipe}.png" alt="${equipe.nomeEquipe}" style="height: 100px;">
+                                </div>`;
                             equipesContainer.append(equipeCard);
-
                         });
                     })
                     .catch(error => console.error('Erro ao carregar equipes:', error));
@@ -306,7 +288,6 @@
             carregarEquipes();
             carregarUsuarios();
             carregarEstatisticasGerais();
-
         });
     </script>
 </body>

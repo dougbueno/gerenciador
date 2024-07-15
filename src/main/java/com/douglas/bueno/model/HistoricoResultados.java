@@ -30,9 +30,9 @@ public class HistoricoResultados {
 	@Column(name = "pontos")
 	private Integer pontos;
 	@Column(name = "vitorias")
-	private Integer vitoria;
-	@Column(name = "empate")
-	private Integer empate;
+	private Integer vitorias;
+	@Column(name = "empates")
+	private Integer empates;
 	@Column(name = "derrotas")
 	private Integer derrotas;
 	@Column(name = "golsMarcados")
