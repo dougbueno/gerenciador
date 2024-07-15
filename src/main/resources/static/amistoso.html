@@ -98,7 +98,7 @@
             const visitanteSelect = document.getElementById('visitante');
             const iniciarAmistosoBtn = document.getElementById('iniciarAmistosoBtn');
 
-            fetch('http://localhost:8080/api/usuarios')
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(usuario => {
@@ -176,7 +176,7 @@
 
 
 
-            fetch('http://localhost:8080/api/amistoso', {
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/amistoso', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

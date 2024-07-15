@@ -68,10 +68,10 @@
 
             // Função para carregar as equipes da API e popular o dropdown
             function carregarEquipes() {
-                fetch('http://localhost:8080/api/equipes/')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/equipes/')
                     .then(response => response.json())
                     .then(dataEquipes => {
-                        fetch('http://localhost:8080/api/usuarios/')
+                        fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios/')
                             .then(response => response.json())
                             .then(dataUsuarios => {
                                 const selectEquipe = document.getElementById('equipe');
@@ -105,7 +105,7 @@
 
             // Função para carregar os usuários da API e popular a tabela
             function carregarUsuarios() {
-                fetch('http://localhost:8080/api/usuarios/')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios/')
                     .then(response => response.json())
                     .then(data => {
                         const tabelaUsuarios = document.getElementById('tabelaUsuarios');
@@ -129,7 +129,7 @@
 
             // Função para editar um usuário
             window.editarUsuario = function (id) {
-                fetch(`http://localhost:8080/api/usuarios/${id}`)
+                fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios/${id}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('usuarioId').value = data.id;
@@ -150,7 +150,7 @@
             // Função para excluir um usuário
             window.excluirUsuario = function (id) {
                 if (confirm(`Tem certeza que deseja excluir o usuário com ID ${id}?`)) {
-                    fetch(`http://localhost:8080/api/usuarios/${id}`, {
+                    fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios/${id}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
@@ -178,7 +178,7 @@
                     equipe: formData.get('equipe')
                 };
 
-                const url = usuarioId ? `http://localhost:8080/api/usuarios/${usuarioId}` : 'http://localhost:8080/api/usuarios/criar';
+                const url = usuarioId ? `https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios/${usuarioId}` : 'https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios/criar';
                 const method = usuarioId ? 'PUT' : 'POST';
 
                 fetch(url, {

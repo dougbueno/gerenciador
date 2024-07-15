@@ -198,7 +198,7 @@
             // Função para buscar e preencher os campeonatos atuais
             function carregarCampeonatos() {
                 // Fetch API para buscar os dados dos campeonatos
-                fetch('http://localhost:8080/api/campeonatos')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos')
                     .then(response => response.json())
                     .then(data => {
                         const campeonatosContainer = $('#campeonatos');
@@ -217,7 +217,7 @@
 
             // Função para carregar equipes
             function carregarEquipes() {
-                fetch('http://localhost:8080/api/equipes')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/equipes')
                     .then(response => response.json())
                     .then(data => {
                         const equipesContainer = $('#equipes');
@@ -237,7 +237,7 @@
             // Função para carregar usuários
             function carregarUsuarios() {
                 // Fetch API para buscar os dados dos usuários
-                fetch('http://localhost:8080/api/usuarios')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
                     .then(response => response.json())
                     .then(data => {
                         const usuarioContainer = $('#usuarios');
@@ -261,7 +261,7 @@
             // Função para carregar estatísticas gerais
             function carregarEstatisticasGerais() {
                 // Supondo que você tem um endpoint para estatísticas
-                fetch('http://localhost:8080/api/estatisticas')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/estatisticas')
                     .then(response => response.json())
                     .then(data => {
                         $('#totalCampeonatos').text(data.totalCampeonatos);

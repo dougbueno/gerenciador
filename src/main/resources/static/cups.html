@@ -106,7 +106,7 @@
         });
 
         function carregarCampeonatos() {
-            fetch('http://localhost:8080/api/campeonatos')
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos')
                 .then(response => response.json())
                 .then(data => {
                     const campeonatoContainer = document.getElementById('campeonatoContainer');
@@ -152,7 +152,7 @@
         }
 
         function carregarUsuarios() {
-            fetch('http://localhost:8080/api/usuarios')
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
                 .then(response => response.json())
                 .then(data => {
                     const usuariosContainer = document.getElementById('usuariosContainer');
@@ -425,7 +425,7 @@
                 ano: new Date().getFullYear()
             };
 
-            fetch('http://localhost:8080/api/titulos', {
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/titulos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -454,7 +454,7 @@
             console.log('Dados do histórico:', dadosHistorico);
 
 
-            fetch('http://localhost:8080/api/historico', {
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
