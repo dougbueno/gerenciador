@@ -9,23 +9,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.douglas.bueno.model.Amistoso;
+import com.douglas.bueno.model.Jogos;
 import com.douglas.bueno.repository.AmistosoRepository;
 
 @RestController
-@RequestMapping("/api/amistoso")
-public class AmistosoController {
+@RequestMapping("/api/jogos")
+public class JogosController {
 
 	@Autowired
 	private AmistosoRepository amistosoRepository;
 
-	@PostMapping
-	public Amistoso createCampeonatos(@RequestBody Amistoso amistoso) {
+	@PostMapping("/amistoso")
+	public Jogos salvarAmistosos(@RequestBody Jogos amistoso) {
 		return amistosoRepository.save(amistoso);
 	}
 	
-	@GetMapping
-	public List<Amistoso> createAmistoso() {
+	@GetMapping("/amistoso")
+	public List<Jogos> recuperaTodosJogosAmistoso() {
 		return amistosoRepository.findAll();
 	}
 

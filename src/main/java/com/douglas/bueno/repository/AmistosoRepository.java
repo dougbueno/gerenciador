@@ -2,8 +2,8 @@ package com.douglas.bueno.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.douglas.bueno.model.Amistoso;
+import com.douglas.bueno.model.Jogos;
 
-public interface AmistosoRepository extends JpaRepository<Amistoso, Long> {
+public interface AmistosoRepository extends JpaRepository<Jogos, Long> {
 
 }
