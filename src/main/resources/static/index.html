@@ -53,7 +53,7 @@
         <!-- Seção de Equipes -->
         <div class="my-4">
             <h2>Equipes</h2>
-            <div id="equipes" class="row image-container"></div>
+            <div id="equipes" class="row"></div>
         </div>
 
         <!-- Seção de Usuários -->
@@ -206,9 +206,13 @@
 
                         data.forEach(campeonato => {
                             const campeonatoCard = `
-                                 <div class="col-md-2">
-                                  ${campeonato.nomeCampeonato}
-                                 </div>`;
+                                  <div class="col-md-2 mb-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            ${campeonato.nomeCampeonato}
+                                        </div>
+                                    </div>
+                                </div>`;
                             campeonatosContainer.append(campeonatoCard);
                         });
                     })
@@ -225,8 +229,12 @@
 
                         data.forEach(equipe => {
                             const equipeCard = `
-                                <div class="col-md-1 mb-4">
-                                   ${equipe.nomeEquipe}
+                                  <div class="col-md-2 mb-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            ${equipe.nomeEquipe}
+                                        </div>
+                                    </div>
                                 </div>`;
                             equipesContainer.append(equipeCard);
                         });
