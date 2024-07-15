@@ -1,0 +1,1 @@
+const apiUrl = '${API_URL}';

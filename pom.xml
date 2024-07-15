@@ -8,10 +8,10 @@
 		<version>2.6.13</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.fsc</groupId>
-	<artifactId>postegresql</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
-	<name>postegresql</name>
+	<groupId>com.douglas.bueno</groupId>
+	<artifactId>douglas</artifactId>
+	<version>0.0.3-SNAPSHOT</version>
+	<name>douglas</name>
 	<description>Gerenciador de resultados</description>
 	<properties>
 		<java.version>17</java.version>

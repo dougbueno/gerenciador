@@ -15,6 +15,7 @@
     <link href="./css/navbars.css" rel="stylesheet">
     <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/header.js"></script>
+    <script src="/js/config.js"></script>
 </head>
 
 <body>
@@ -55,7 +56,7 @@
 
             // Função para carregar as equipes da API e popular a tabela
             function carregarEquipes() {
-                fetch('http://localhost:8080/api/equipes')
+                fetch(`${apiUrl}/api/equipes`)
                     .then(response => response.json())
                     .then(data => {
                         const tabelaEquipes = document.getElementById('tabelaEquipes');
@@ -78,7 +79,7 @@
 
             // Função para editar uma equipe
             window.editarEquipe = function (id) {
-                fetch(`http://localhost:8080/api/equipes/${id}`)
+                fetch(`${apiUrl}/api/equipes/${id}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('equipeId').value = data.id;
@@ -90,7 +91,7 @@
             // Função para excluir uma equipe
             window.excluirEquipe = function (id) {
                 if (confirm(`Tem certeza que deseja excluir a equipe com ID ${id}?`)) {
-                    fetch(`http://localhost:8080/api/equipes/${id}`, {
+                    fetch(`${apiUrl}/api/equipes/${id}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
@@ -117,7 +118,7 @@
                     nomeEquipe: formData.get('nomeEquipe')
                 };
 
-                const url = equipeId ? `http://localhost:8080/api/equipes/${equipeId}` : 'http://localhost:8080/api/equipes';
+                const url = equipeId ? `${apiUrl}/api/equipes/${equipeId}` : `${apiUrl}/api/equipes`;
                 const method = equipeId ? 'PUT' : 'POST';
 
                 fetch(url, {
