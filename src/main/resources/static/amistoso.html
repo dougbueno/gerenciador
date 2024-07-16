@@ -48,7 +48,7 @@
                 <tbody>
                     <tr>
                         <td>
-                            <div id="casaContainer"></div>
+                            <select id="casaSelect" class="form-control"></select>
                         </td>
                         <td>
                             <input type="number" class="form-control" id="golsCasa" name="golsCasa" value="0" min="0"
@@ -60,7 +60,7 @@
                                 min="0" required>
                         </td>
                         <td>
-                            <div id="visitanteContainer"></div>
+                            <select id="visitanteSelect" class="form-control"></select>
                         </td>
                     </tr>
                 </tbody>
@@ -80,6 +80,7 @@
                     <th>X</th>
                     <th>Gols Visitante</th>
                     <th>Visitante</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody>
@@ -90,72 +91,53 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            adicionarResultadoNaTabela();
+            carregarUsuarios();
+            carregarResultados();
 
-            const casaContainer = document.getElementById('casaContainer');
-            const visitanteContainer = document.getElementById('visitanteContainer');
+            const casaSelect = document.getElementById('casaSelect');
+            const visitanteSelect = document.getElementById('visitanteSelect');
             const inserirResultadoBtn = document.getElementById('inserirResultadoBtn');
             const finalizarAmistosoBtn = document.getElementById('finalizarAmistosoBtn');
 
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(usuario => {
-                        const casaCheckbox = document.createElement('input');
-                        casaCheckbox.type = 'checkbox';
-                        casaCheckbox.id = 'casa_' + usuario.nome;
-                        casaCheckbox.name = 'casa';
-                        casaCheckbox.value = usuario.nome;
-                        casaCheckbox.addEventListener('change', function () {
-                            desabilitarOutrosCheckboxes(casaCheckbox, casaContainer);
-                            validarSelecaoUsuarios();
+            function carregarUsuarios() {
+                fetch('http://localhost:8080/api/usuarios')
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(usuario => {
+                            const casaOption = document.createElement('option');
+                            casaOption.value = usuario.nome;
+                            casaOption.textContent = usuario.nome;
+                            casaSelect.appendChild(casaOption);
+
+                            const visitanteOption = casaOption.cloneNode(true);
+                            visitanteSelect.appendChild(visitanteOption);
                         });
 
-                        const casaLabel = document.createElement('label');
-                        casaLabel.htmlFor = casaCheckbox.id;
-                        casaLabel.textContent = usuario.nome;
+                        casaSelect.addEventListener('change', validarSelecaoUsuarios);
+                        visitanteSelect.addEventListener('change', validarSelecaoUsuarios);
+                    })
+                    .catch(error => console.error('Erro ao carregar usuários:', error));
+            }
 
-                        casaContainer.appendChild(casaCheckbox);
-                        casaContainer.appendChild(casaLabel);
-                        casaContainer.appendChild(document.createElement('br'));
-
-                        const visitanteCheckbox = casaCheckbox.cloneNode();
-                        visitanteCheckbox.id = 'visitante_' + usuario.nome;
-                        visitanteCheckbox.name = 'visitante';
-                        visitanteCheckbox.addEventListener('change', function () {
-                            desabilitarOutrosCheckboxes(visitanteCheckbox, visitanteContainer);
-                            validarSelecaoUsuarios();
+            function carregarResultados() {
+                fetch('http://localhost:8080/api/jogos/amistoso')
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(resultado => {
+                            adicionarResultadoNaTabela(resultado);
                         });
-
-                        const visitanteLabel = document.createElement('label');
-                        visitanteLabel.htmlFor = visitanteCheckbox.id;
-                        visitanteLabel.textContent = usuario.nome;
-
-                        visitanteContainer.appendChild(visitanteCheckbox);
-                        visitanteContainer.appendChild(visitanteLabel);
-                        visitanteContainer.appendChild(document.createElement('br'));
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar usuários:', error));
-
-            function desabilitarOutrosCheckboxes(selecionado, container) {
-                const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(checkbox => {
-                    if (checkbox !== selecionado) {
-                        checkbox.disabled = selecionado.checked;
-                    }
-                });
+                    })
+                    .catch(error => console.error('Erro ao carregar resultados:', error));
             }
 
             function validarSelecaoUsuarios() {
-                const casaSelecionado = casaContainer.querySelector('input[type="checkbox"]:checked');
-                const visitanteSelecionado = visitanteContainer.querySelector('input[type="checkbox"]:checked');
+                const casaSelecionado = casaSelect.value;
+                const visitanteSelecionado = visitanteSelect.value;
 
                 if (casaSelecionado && visitanteSelecionado) {
-                    if (casaSelecionado.value === visitanteSelecionado.value) {
+                    if (casaSelecionado === visitanteSelecionado) {
                         alert('Por favor, selecione um usuário diferente para visitante.');
-                        visitanteSelecionado.checked = false;
-                        desabilitarOutrosCheckboxes(visitanteSelecionado, visitanteContainer);
+                        visitanteSelect.value = '';
                     }
                 }
 
@@ -163,19 +145,21 @@
             }
 
             function validarInicioAmistoso() {
-                const casaSelecionado = casaContainer.querySelector('input[type="checkbox"]:checked');
-                const visitanteSelecionado = visitanteContainer.querySelector('input[type="checkbox"]:checked');
+                const casaSelecionado = casaSelect.value;
+                const visitanteSelecionado = visitanteSelect.value;
 
-                if (casaSelecionado && visitanteSelecionado && !casaSelecionado.disabled && !visitanteSelecionado.disabled) {
+                if (casaSelecionado && visitanteSelecionado && casaSelecionado !== visitanteSelecionado) {
                     inserirResultadoBtn.disabled = false;
+                    finalizarAmistosoBtn.disabled = false
                 } else {
                     inserirResultadoBtn.disabled = true;
+
                 }
             }
 
             inserirResultadoBtn.addEventListener('click', function () {
-                const casaSelecionado = casaContainer.querySelector('input[type="checkbox"]:checked');
-                const visitanteSelecionado = visitanteContainer.querySelector('input[type="checkbox"]:checked');
+                const casaSelecionado = casaSelect.value;
+                const visitanteSelecionado = visitanteSelect.value;
                 const golsCasa = parseInt(document.getElementById('golsCasa').value);
                 const golsVisitante = parseInt(document.getElementById('golsVisitante').value);
 
@@ -185,27 +169,26 @@
                 }
 
                 const data = {
-                    casa: casaSelecionado.value,
+                    casa: casaSelecionado,
                     golsCasa: golsCasa,
-                    visitante: visitanteSelecionado.value,
+                    visitante: visitanteSelecionado,
                     golsVisitante: golsVisitante,
                     campeonato: "Amistoso"
                 };
 
-                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso', {
+                fetch('http://localhost:8080/api/jogos/amistoso', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            adicionarResultadoNaTabela(data);
-                            casaSelecionado.disabled = true;
-                            visitanteSelecionado.disabled = true;
-                            finalizarAmistosoBtn.disabled = false;
-                        }
+                    .then(response => response.json())
+                    .then(resultado => {
+                        adicionarResultadoNaTabela(resultado);
+                        casaSelect.querySelector(`option[value="${casaSelecionado}"]`).disabled = true;
+                        visitanteSelect.querySelector(`option[value="${visitanteSelecionado}"]`).disabled = true;
+                        finalizarAmistosoBtn.disabled = false;
                         resetInputs();
                     })
                     .catch(error => {
@@ -226,7 +209,7 @@
             });
 
             function atualizaStatusAtivo() {
-                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso/atualizar', {
+                fetch('http://localhost:8080/api/jogos/amistoso/atualizar', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -238,7 +221,78 @@
                         console.error('Erro ao atualizar status:', response.status);
                     }
                 })
-                    .catch(error => console.error('Erro ao fazer requisição:', error));
+                    .catch(error => console.error('Erro ao atualizar status:', error));
+            }
+
+            function adicionarResultadoNaTabela(resultado) {
+                const resultadosTableBody = document.querySelector('#resultadosTable tbody');
+
+                if (resultado && resultado.casa) {
+                    const novaLinha = document.createElement('tr');
+
+                    const colunaCasa = document.createElement('td');
+                    colunaCasa.textContent = resultado.casa;
+                    novaLinha.appendChild(colunaCasa);
+
+                    const colunaGolsCasa = document.createElement('td');
+                    colunaGolsCasa.textContent = resultado.golsCasa;
+                    novaLinha.appendChild(colunaGolsCasa);
+
+                    const colunaX = document.createElement('td');
+                    colunaX.textContent = 'X';
+                    novaLinha.appendChild(colunaX);
+
+                    const colunaGolsVisitante = document.createElement('td');
+                    colunaGolsVisitante.textContent = resultado.golsVisitante;
+                    novaLinha.appendChild(colunaGolsVisitante);
+
+                    const colunaVisitante = document.createElement('td');
+                    colunaVisitante.textContent = resultado.visitante;
+                    novaLinha.appendChild(colunaVisitante);
+
+                    const colunaAcao = document.createElement('td');
+                    const editarBtn = document.createElement('button');
+                    editarBtn.className = 'btn btn-warning btn-sm me-2';
+                    editarBtn.textContent = 'Editar';
+                    editarBtn.addEventListener('click', function () {
+                        editarResultado(resultado, novaLinha);
+                    });
+                    colunaAcao.appendChild(editarBtn);
+
+                    const excluirBtn = document.createElement('button');
+                    excluirBtn.className = 'btn btn-danger btn-sm';
+                    excluirBtn.textContent = 'Excluir';
+                    excluirBtn.addEventListener('click', function () {
+                        excluirResultado(resultado, novaLinha);
+                    });
+                    colunaAcao.appendChild(excluirBtn);
+
+                    novaLinha.appendChild(colunaAcao);
+
+                    resultadosTableBody.appendChild(novaLinha);
+                }
+            }
+
+            function resetInputs() {
+                document.getElementById('golsCasa').value = 0;
+                document.getElementById('golsVisitante').value = 0;
+                validarInicioAmistoso();
+            }
+
+            function resetForm() {
+                casaSelect.querySelectorAll('option').forEach(option => {
+                    option.disabled = false;
+                });
+
+                visitanteSelect.querySelectorAll('option').forEach(option => {
+                    option.disabled = false;
+                });
+
+                casaSelect.value = '';
+                visitanteSelect.value = '';
+                resetInputs();
+                inserirResultadoBtn.disabled = true;
+                finalizarAmistosoBtn.disabled = true;
             }
 
             function adicionarEstatisticasNaTabela() {
@@ -277,17 +331,17 @@
                         <td>VIT CASA</td>
                         <td>EMP</td>
                         <td>VIT VISIT</td>
-                         <td></td>
-                         <td></td>
-                         <td></td>
+                        <td>GOLS CASA</td>
+                        <td>GOLS VISITANTE</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>${vitoriasCasa} (${percentualVitoriasCasa}%)</td>
                         <td>${empates} (${percentualEmpates}%)</td>
                         <td>${vitoriasVisitante} (${percentualVitoriasVisitante}%)</td>
-                          <td></td>
-                         <td></td>
-                         <td></td>
+                        <td>${golsFeitosCasa}</td>
+                        <td>${golsFeitosVisitante}</td>
+                        <td></td>
                     </tr>
                 `;
 
@@ -295,68 +349,100 @@
             }
 
             function capturarImagemTabela() {
-                const resultadosTable = document.getElementById('resultadosTable');
-                html2canvas(resultadosTable).then(canvas => {
+                const tabela = document.getElementById('resultadosTable');
+                html2canvas(tabela).then(canvas => {
+                    const imagem = canvas.toDataURL('image/png');
+
                     const link = document.createElement('a');
-                    link.href = canvas.toDataURL('image/png');
-                    link.download = 'tabela_resultados.png';
+                    link.href = imagem;
+                    link.download = 'resultados_amistoso.png';
                     link.click();
                 });
             }
 
-            function resetInputs() {
-                document.getElementById('golsCasa').value = '0';
-                document.getElementById('golsVisitante').value = '0';
+            function editarResultado(resultado, linha) {
+                const golsCasaInput = document.createElement('input');
+                golsCasaInput.type = 'number';
+                golsCasaInput.className = 'form-control';
+                golsCasaInput.value = resultado.golsCasa;
+
+                const golsVisitanteInput = document.createElement('input');
+                golsVisitanteInput.type = 'number';
+                golsVisitanteInput.className = 'form-control';
+                golsVisitanteInput.value = resultado.golsVisitante;
+
+                const colunaGolsCasa = linha.children[1];
+                const colunaGolsVisitante = linha.children[3];
+
+                colunaGolsCasa.textContent = '';
+                colunaGolsCasa.appendChild(golsCasaInput);
+                colunaGolsVisitante.textContent = '';
+                colunaGolsVisitante.appendChild(golsVisitanteInput);
+
+                const editarBtn = linha.children[5].children[0];
+                editarBtn.textContent = 'Salvar';
+                editarBtn.classList.remove('btn-warning');
+                editarBtn.classList.add('btn-success');
+
+                editarBtn.removeEventListener('click', editarResultado);
+                editarBtn.addEventListener('click', function () {
+                    salvarEdicao(resultado, linha, golsCasaInput, golsVisitanteInput);
+                });
             }
 
-            function resetForm() {
-                const casaCheckboxes = casaContainer.querySelectorAll('input[type="checkbox"]');
-                casaCheckboxes.forEach(checkbox => {
-                    checkbox.checked = false;
-                    checkbox.disabled = false;
-                });
+            function salvarEdicao(resultado, linha, golsCasaInput, golsVisitanteInput) {
+                const golsCasa = parseInt(golsCasaInput.value);
+                const golsVisitante = parseInt(golsVisitanteInput.value);
 
-                const visitanteCheckboxes = visitanteContainer.querySelectorAll('input[type="checkbox"]');
-                visitanteCheckboxes.forEach(checkbox => {
-                    checkbox.checked = false;
-                    checkbox.disabled = false;
-                });
-
-                finalizarAmistosoBtn.disabled = true;
-                inserirResultadoBtn.disabled = true;
-            }
-
-            function adicionarResultadoNaTabela(resultado) {
-                const resultadosTableBody = document.querySelector('#resultadosTable tbody');
-
-                if (resultado) {
-                    const novaLinha = document.createElement('tr');
-                    novaLinha.innerHTML = `
-                        <td>${resultado.casa}</td>
-                        <td>${resultado.golsCasa}</td>
-                        <td>X</td>
-                        <td>${resultado.golsVisitante}</td>
-                        <td>${resultado.visitante}</td>
-                    `;
-                    resultadosTableBody.appendChild(novaLinha);
-                } else {
-                    fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso')
-                        .then(response => response.json())
-                        .then(data => {
-                            data.forEach(item => {
-                                const novaLinha = document.createElement('tr');
-                                novaLinha.innerHTML = `
-                                    <td>${item.casa}</td>
-                                    <td>${item.golsCasa}</td>
-                                    <td>X</td>
-                                    <td>${item.golsVisitante}</td>
-                                    <td>${item.visitante}</td>
-                                `;
-                                resultadosTableBody.appendChild(novaLinha);
-                            });
-                        })
-                        .catch(error => console.error('Erro ao carregar resultados:', error));
+                if (golsCasa < 0 || golsVisitante < 0) {
+                    alert('Os valores dos gols não podem ser menores que 0.');
+                    return;
                 }
+
+                const data = {
+                    golsCasa: golsCasa,
+                    golsVisitante: golsVisitante
+                };
+
+                fetch(`http://localhost:8080/api/jogos/amistoso/${resultado.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            linha.children[1].textContent = data.golsCasa;
+                            linha.children[3].textContent = data.golsVisitante;
+
+                            const editarBtn = linha.children[5].children[0];
+                            editarBtn.textContent = 'Editar';
+                            editarBtn.classList.remove('btn-success');
+                            editarBtn.classList.add('btn-warning');
+
+                            editarBtn.addEventListener('click', function () {
+                                editarResultado(resultado, linha);
+                            });
+                        } else {
+                            console.error('Erro ao salvar edição:', response.status);
+                        }
+                    })
+                    .catch(error => console.error('Erro ao salvar edição:', error));
+            }
+
+            function excluirResultado(resultado, linha) {
+                fetch(`http://localhost:8080/api/jogos/amistoso/${resultado.id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            linha.remove();
+                        } else {
+                            console.error('Erro ao excluir resultado:', response.status);
+                        }
+                    })
+                    .catch(error => console.error('Erro ao excluir resultado:', error));
             }
         });
     </script>
