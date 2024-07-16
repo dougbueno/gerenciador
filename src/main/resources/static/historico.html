@@ -15,6 +15,7 @@
     <link href="./css/navbars.css" rel="stylesheet">
     <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/header.js"></script>
+
 </head>
 
 <body>
@@ -28,7 +29,7 @@
 
     <script>
         $(document).ready(function () {
-            fetch('http://localhost:8080/api/historico/ordenado')
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico/ordenado')
                 .then(response => response.json())
                 .then(data => {
                     const historicoPorCampeonato = document.getElementById('historicoPorCampeonato');

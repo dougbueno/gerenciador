@@ -23,6 +23,7 @@
             text-align: center;
         }
     </style>
+
 </head>
 
 <body>
@@ -106,7 +107,7 @@
         });
 
         function carregarCampeonatos() {
-            fetch('http://localhost:8080/api/campeonatos')
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos')
                 .then(response => response.json())
                 .then(data => {
                     const campeonatoContainer = document.getElementById('campeonatoContainer');
@@ -153,7 +154,7 @@
         }
 
         function carregarUsuarios() {
-            fetch('http://localhost:8080/api/usuarios')
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
                 .then(response => response.json())
                 .then(data => {
                     const usuariosContainer = document.getElementById('usuariosContainer');
@@ -427,7 +428,7 @@
                 ano: new Date().getFullYear()
             };
 
-            fetch('http://localhost:8080/api/titulos', {
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/titulos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -454,7 +455,7 @@
                 saldoGol: usuario.saldoGols
             }));
 
-            fetch('http://localhost:8080/api/historico/campeonato', {
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico/campeonato', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -481,7 +482,7 @@
                 saldoGol: usuario.saldoGols
             }));
 
-            fetch('http://localhost:8080/api/historico/premierLeague', {
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico/premierLeague', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
