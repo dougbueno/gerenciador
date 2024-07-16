@@ -100,7 +100,7 @@
             const finalizarAmistosoBtn = document.getElementById('finalizarAmistosoBtn');
 
             function carregarUsuarios() {
-                fetch('http://localhost:8080/api/usuarios')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(usuario => {
@@ -120,7 +120,7 @@
             }
 
             function carregarResultados() {
-                fetch('http://localhost:8080/api/jogos/amistoso')
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso')
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(resultado => {
@@ -176,7 +176,7 @@
                     campeonato: "Amistoso"
                 };
 
-                fetch('http://localhost:8080/api/jogos/amistoso', {
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -209,7 +209,7 @@
             });
 
             function atualizaStatusAtivo() {
-                fetch('http://localhost:8080/api/jogos/amistoso/atualizar', {
+                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso/atualizar', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -327,12 +327,15 @@
                 const percentualEmpates = ((empates / totalJogos) * 100).toFixed(2);
 
                 const novaLinha = `
+                  <tr>
+                        <td colspan="6">Estatisticas do Amistoso</td>
+                    </tr>
                     <tr>
-                        <td>VIT CASA</td>
-                        <td>EMP</td>
-                        <td>VIT VISIT</td>
-                        <td>GOLS CASA</td>
-                        <td>GOLS VISITANTE</td>
+                        <td>Vit Casa</td>
+                        <td>EmpatesMP</td>
+                        <td>Vit Visitante</td>
+                        <td>Gols Casa</td>
+                        <td>Gols Visitante</td>
                         <td></td>
                     </tr>
                     <tr>
@@ -404,7 +407,7 @@
                     golsVisitante: golsVisitante
                 };
 
-                fetch(`http://localhost:8080/api/jogos/amistoso/${resultado.id}`, {
+                fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso/${resultado.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -432,7 +435,7 @@
             }
 
             function excluirResultado(resultado, linha) {
-                fetch(`http://localhost:8080/api/jogos/amistoso/${resultado.id}`, {
+                fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso/${resultado.id}`, {
                     method: 'DELETE'
                 })
                     .then(response => {
