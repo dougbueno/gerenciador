@@ -62,7 +62,7 @@ public class HistoricoResultadosController {
 		return ResponseEntity.ok().build();
 	}
 
-	@PostMapping
+	@PostMapping("/campeonato")
 	public ResponseEntity<?> insereResultados(@RequestBody List<HistoricoResultados> historicoResultados) {
 		Integer ordem = historicoRepository
 				.findMaxOrdemHistoricoByCampeonato(historicoResultados.get(0).getCampeonato());

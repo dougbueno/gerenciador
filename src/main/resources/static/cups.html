@@ -106,20 +106,21 @@
         });
 
         function carregarCampeonatos() {
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos')
+            fetch('http://localhost:8080/api/campeonatos')
                 .then(response => response.json())
                 .then(data => {
                     const campeonatoContainer = document.getElementById('campeonatoContainer');
                     campeonatoContainer.innerHTML = '';
+
                     data.forEach(campeonato => {
                         const checkbox = `
-                            <div class="form-check">
-                                <input class="form-check-input campeonato-checkbox" type="checkbox" id="campeonato-${campeonato.id}" value="${campeonato.nomeCampeonato}">
-                                <label class="form-check-label" for="campeonato-${campeonato.id}">
-                                    ${campeonato.nomeCampeonato}
-                                </label>
-                            </div>
-                        `;
+                    <div class="form-check">
+                        <input class="form-check-input campeonato-checkbox" type="checkbox" id="campeonato-${campeonato.id}" value="${campeonato.nomeCampeonato}" ${campeonato.nomeCampeonato === 'Premier League' ? 'disabled' : ''}>
+                        <label class="form-check-label" for="campeonato-${campeonato.id}">
+                            ${campeonato.nomeCampeonato}
+                        </label>
+                    </div>
+                `;
                         campeonatoContainer.insertAdjacentHTML('beforeend', checkbox);
                     });
 
@@ -152,7 +153,7 @@
         }
 
         function carregarUsuarios() {
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
+            fetch('http://localhost:8080/api/usuarios')
                 .then(response => response.json())
                 .then(data => {
                     const usuariosContainer = document.getElementById('usuariosContainer');
@@ -201,18 +202,6 @@
             const checkboxes = document.querySelectorAll('#usuariosContainer input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
                 checkbox.disabled = true;
-            });
-        }
-
-        function desabilitarPremierLeague() {
-            const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
-
-            checkboxes.forEach(checkbox => {
-                if (checkbox.value === 'Premier League') {
-                    checkbox.disabled = true;
-                } else {
-                    checkbox.disabled = false; // Garante que outros checkboxes não relacionados sejam habilitados
-                }
             });
         }
 
@@ -334,6 +323,7 @@
 
                         enviarDadosCampeao(usuarios);
                         enviarDadosHistorico(usuarios);
+                        enviarDadosHistoricoPremierLeague(usuarios);
                     }
                 });
             });
@@ -437,7 +427,7 @@
                 ano: new Date().getFullYear()
             };
 
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/titulos', {
+            fetch('http://localhost:8080/api/titulos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -464,7 +454,7 @@
                 saldoGol: usuario.saldoGols
             }));
 
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico', {
+            fetch('http://localhost:8080/api/historico/campeonato', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -474,11 +464,14 @@
                 .then(response => response.json())
                 .then(data => console.log('Dados do histórico enviados com sucesso:', data))
                 .catch(error => console.error('Erro ao enviar dados do histórico:', error));
+        }
 
-            dadosHistorico = usuarios.map(usuario => ({
+        function enviarDadosHistoricoPremierLeague(usuarios) {
+            const campeonato = "Premier League";
+            const dadosHistorico = usuarios.map(usuario => ({
                 usuario: usuario.usuario,
                 equipe: usuario.equipe,
-                campeonato: "Premier League",
+                campeonato: campeonato,
                 pontos: usuario.pontos,
                 vitorias: usuario.vitorias,
                 empates: usuario.empates,
@@ -487,7 +480,8 @@
                 golsSofridos: usuario.golsSofridos,
                 saldoGol: usuario.saldoGols
             }));
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico/premierLeague', {
+
+            fetch('http://localhost:8080/api/historico/premierLeague', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
