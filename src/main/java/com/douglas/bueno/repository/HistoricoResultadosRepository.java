@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import com.douglas.bueno.model.HistoricoResultados;
 
 public interface HistoricoResultadosRepository extends JpaRepository<HistoricoResultados, Long> {
-	
+
+	List<HistoricoResultados> findAllByCampeonatoAndAnoCampeonato(String campeonato, Integer ano);
 
 	@Query("SELECT h FROM HistoricoResultados h ORDER BY h.campeonato,h.ordem, h.pontos DESC")
 	List<HistoricoResultados> findAllOrderByCampeonatoAndPontos();
@@ -27,7 +28,8 @@ public interface HistoricoResultadosRepository extends JpaRepository<HistoricoRe
 	@Query("SELECT h.usuario " + "FROM HistoricoResultados h GROUP BY h.usuario " + "ORDER BY SUM(h.golsSofridos) ASC")
 	List<String> findOneUsuarioComMenosGolsSofridos();
 
-	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.vitorias) DESC")
+	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario "
+			+ "ORDER BY SUM(h.vitorias) DESC")
 	List<String> findOneUsuarioComMaisVitorias();
 
 	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.vitorias) ASC")
@@ -51,7 +53,7 @@ public interface HistoricoResultadosRepository extends JpaRepository<HistoricoRe
 
 	@Query("SELECT h.usuario " + "FROM HistoricoResultados h " + "GROUP BY h.usuario " + "ORDER BY SUM(h.empates) ASC")
 	List<String> findOneUsuarioComMenosEmpates();
-	
+
 	@Query("SELECT MAX(hr.ordem) FROM HistoricoResultados hr WHERE hr.campeonato = :campeonato")
 	Integer findMaxOrdemHistoricoByCampeonato(String campeonato);
 

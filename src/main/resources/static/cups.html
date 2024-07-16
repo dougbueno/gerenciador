@@ -204,6 +204,18 @@
             });
         }
 
+        function desabilitarPremierLeague() {
+            const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.value === 'Premier League') {
+                    checkbox.disabled = true;
+                } else {
+                    checkbox.disabled = false; // Garante que outros checkboxes não relacionados sejam habilitados
+                }
+            });
+        }
+
         function obterCampeonatoSelecionado() {
             const checkboxes = document.querySelectorAll('#campeonatoContainer input[type="checkbox"]');
             for (let i = 0; i < checkboxes.length; i++) {
@@ -451,10 +463,31 @@
                 golsSofridos: usuario.golsSofridos,
                 saldoGol: usuario.saldoGols
             }));
-            console.log('Dados do histórico:', dadosHistorico);
-
 
             fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosHistorico)
+            })
+                .then(response => response.json())
+                .then(data => console.log('Dados do histórico enviados com sucesso:', data))
+                .catch(error => console.error('Erro ao enviar dados do histórico:', error));
+
+            dadosHistorico = usuarios.map(usuario => ({
+                usuario: usuario.usuario,
+                equipe: usuario.equipe,
+                campeonato: "Premier League",
+                pontos: usuario.pontos,
+                vitorias: usuario.vitorias,
+                empates: usuario.empates,
+                derrotas: usuario.derrotas,
+                golsMarcados: usuario.golsMarcados,
+                golsSofridos: usuario.golsSofridos,
+                saldoGol: usuario.saldoGols
+            }));
+            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico/premierLeague', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -1,5 +1,7 @@
 package com.douglas.bueno.model;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,7 +22,7 @@ public class HistoricoResultados {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "ordemHistorico")
-	private Long ordem;
+	private Long ordem = 1L;
 	@Column(name = "usuario")
 	private String usuario;
 	@Column(name = "equipe")
@@ -41,6 +43,8 @@ public class HistoricoResultados {
 	private Integer golsSofridos;
 	@Column(name = "saldoGol")
 	private Integer saldoGol;
+	@Column(name = "anoCampeonato")
+	private Integer anoCampeonato = LocalDateTime.now().getYear();
 
 
 }

@@ -76,4 +76,45 @@ public class HistoricoResultadosController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PostMapping("/premierLeague")
+	public ResponseEntity<?> insereResultadosPremierLeague(@RequestBody List<HistoricoResultados> historicoResultados) {
+
+		List<HistoricoResultados> historicoGeral = historicoRepository
+				.findAllByCampeonatoAndAnoCampeonato("Premier League", historicoResultados.get(0).getAnoCampeonato());
+
+		Integer ordem = historicoRepository
+				.findMaxOrdemHistoricoByCampeonato(historicoResultados.get(0).getCampeonato());
+		if (historicoGeral.isEmpty() && ordem == null ) {
+			for (HistoricoResultados historico : historicoResultados) {
+				historicoRepository.save(historico);
+			}
+		} else if(historicoGeral.isEmpty() && ordem != null ){
+			ordem+=1;
+			for (HistoricoResultados historico : historicoResultados) {
+				historico.setOrdem(Long.valueOf(ordem));
+				historicoRepository.save(historico);
+			}
+		}
+		else {for (HistoricoResultados historicoAntigo : historicoGeral) {
+				for (HistoricoResultados historicoAtual : historicoResultados) {
+					if (historicoAtual.getUsuario().equals(historicoAntigo.getUsuario())) {
+						historicoAntigo.setDerrotas(historicoAntigo.getDerrotas() + historicoAtual.getDerrotas());
+						historicoAntigo.setEmpates(historicoAntigo.getEmpates() + historicoAtual.getEmpates());
+						historicoAntigo
+								.setGolsMarcados(historicoAntigo.getGolsMarcados() + historicoAtual.getGolsMarcados());
+						historicoAntigo
+								.setGolsSofridos(historicoAntigo.getGolsSofridos() + historicoAtual.getGolsSofridos());
+						historicoAntigo.setPontos(historicoAntigo.getPontos() + historicoAtual.getPontos());
+						historicoAntigo.setSaldoGol(historicoAntigo.getSaldoGol() + historicoAtual.getSaldoGol());
+						historicoAntigo.setVitorias(historicoAntigo.getVitorias() + historicoAtual.getVitorias());
+						historicoAntigo.setEquipe(historicoAtual.getEquipe());
+						historicoRepository.save(historicoAntigo);
+					}
+				}
+			}
+		}
+
+		return ResponseEntity.ok().build();
+	}
+
 }
