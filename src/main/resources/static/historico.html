@@ -29,7 +29,7 @@
 
     <script>
         $(document).ready(function () {
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/historico/ordenado')
+            fetch('http://localhost:8080/api/historico/ordenado')
                 .then(response => response.json())
                 .then(data => {
                     const historicoPorCampeonato = document.getElementById('historicoPorCampeonato');

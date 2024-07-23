@@ -56,7 +56,7 @@
 
             // Função para carregar as equipes da API e popular a tabela
             function carregarCampeonatos() {
-                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos')
+                fetch('http://localhost:8080/api/campeonatos')
                     .then(response => response.json())
                     .then(data => {
                         const tabelaCampeonato = document.getElementById('tabelaCampeonato');
@@ -79,7 +79,7 @@
 
             // Função para editar uma equipe
             window.editarCampeonato = function (id) {
-                fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos/${id}`)
+                fetch(`http://localhost:8080/api/campeonatos/${id}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('campeonatoId').value = data.id;
@@ -91,7 +91,7 @@
             // Função para excluir uma equipe
             window.excluirCampeonato = function (id) {
                 if (confirm(`Tem certeza que deseja excluir a campeonato com ID ${id}?`)) {
-                    fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos/${id}`, {
+                    fetch(`http://localhost:8080/api/campeonatos/${id}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
@@ -118,7 +118,7 @@
                     nomeCampeonato: formData.get('nomeCampeonato')
                 };
 
-                const url = campeonatoId ? `https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos/${campeonatoId}` : 'https://gerenciador-80123adaa7f2.herokuapp.com/api/campeonatos';
+                const url = campeonatoId ? `http://localhost:8080/api/campeonatos/${campeonatoId}` : 'http://localhost:8080/api/campeonatos';
                 const method = campeonatoId ? 'PUT' : 'POST';
 
                 fetch(url, {

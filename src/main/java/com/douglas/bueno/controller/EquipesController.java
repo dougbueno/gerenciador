@@ -14,54 +14,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.douglas.bueno.facade.EquipesFacade;
 import com.douglas.bueno.model.Equipes;
-import com.douglas.bueno.repository.EquipesRepository;
 
 @RestController
 @RequestMapping("/api/equipes")
 public class EquipesController {
+
 	@Autowired
-	private EquipesRepository equipesRepository;
+	private EquipesFacade equipesFacade;
 
 	@GetMapping
 	public List<Equipes> getAllEquipes() {
-		return equipesRepository.findAllByOrderByNomeEquipeAsc();
+		return equipesFacade.getAllEquipes();
 	}
-	
+
 	@GetMapping("/{id}")
 	public Optional<Equipes> getById(@PathVariable Long id) {
-		return equipesRepository.findById(id);
+		return equipesFacade.getById(id);
 	}
 
 	@PostMapping
 	public Equipes createEquipes(@RequestBody Equipes equipes) {
-		return equipesRepository.save(equipes);
+		return equipesFacade.createEquipes(equipes);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Equipes> updateUsuarios(@PathVariable Long id, @RequestBody Equipes equipes) {
-		Optional<Equipes> optionalEquipes = equipesRepository.findById(id);
-
-		if (!optionalEquipes.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		Equipes existingEquipes = optionalEquipes.get();
-		existingEquipes.setNomeEquipe(equipes.getNomeEquipe());
-
-		Equipes updatedEquipes = equipesRepository.save(existingEquipes);
-		return ResponseEntity.ok(updatedEquipes);
+	public ResponseEntity<Equipes> updateEquipes(@PathVariable Long id, @RequestBody Equipes equipes) {
+		return equipesFacade.updateEquipes(id, equipes);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteUsuarios(@PathVariable Long id) {
-		Optional<Equipes> optionalEquipes = equipesRepository.findById(id);
-
-		if (!optionalEquipes.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		equipesRepository.deleteById(id);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<?> deleteEquipes(@PathVariable Long id) {
+		return equipesFacade.deleteEquipes(id);
 	}
 }

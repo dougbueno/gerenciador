@@ -3,6 +3,7 @@ package com.douglas.bueno.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.douglas.bueno.facade.EstatisticasFacade;
 import com.douglas.bueno.model.Estatisticas;
 import com.douglas.bueno.repository.CampeonatosRepository;
 import com.douglas.bueno.repository.EquipesRepository;
@@ -10,7 +11,7 @@ import com.douglas.bueno.repository.HistoricoResultadosRepository;
 import com.douglas.bueno.repository.UsuariosRepository;
 
 @Service
-public class EstatisticasService {
+public class EstatisticasServiceFacadeImpl implements EstatisticasFacade {
 
 	@Autowired
 	UsuariosRepository usuariosRepository;
@@ -24,6 +25,7 @@ public class EstatisticasService {
 	@Autowired
 	HistoricoResultadosRepository historicoRepository;
 
+	@Override
 	public Estatisticas obterEstatisticas() {
 		Estatisticas estatisticas = new Estatisticas();
 		estatisticas.setTotalCampeonatos(campeonatosRepository.countCampeonatos());
@@ -41,7 +43,7 @@ public class EstatisticasService {
 		estatisticas.setUsuarioComMenosDerrotas(historicoRepository.findOneUsuarioComMenosDerrotas().get(0));
 		estatisticas.setUsuarioComMaisEmpates(historicoRepository.findOneUsuarioComMaisEmpates().get(0));
 		estatisticas.setUsuarioComMenosEmpates(historicoRepository.findOneUsuarioComMenosEmpates().get(0));
-		
+
 		return estatisticas;
 	}
 

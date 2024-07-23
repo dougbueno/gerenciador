@@ -1,8 +1,6 @@
 package com.douglas.bueno.controller;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,60 +14,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.douglas.bueno.dto.UsuarioTitulosDTO;
+import com.douglas.bueno.facade.TitulosFacade;
 import com.douglas.bueno.model.Titulos;
-import com.douglas.bueno.repository.TitulosRepository;
 
 @RestController
 @RequestMapping("/api/titulos")
 public class TitulosController {
 
 	@Autowired
-	private TitulosRepository titulosRepository;
+	private TitulosFacade titulosFacade;
 
 	@GetMapping
 	public List<Titulos> getAllTitulos() {
-		return titulosRepository.findAllOrderedByAnoDescAndIdDesc();
+		return titulosFacade.getAllTitulos();
 	}
 
 	@GetMapping("/listaCampeoes")
 	public List<UsuarioTitulosDTO> findOrderByMaxTitulos() {
-		List<Object[]> resultados = titulosRepository.findOrderByMaxTitulos();
-		return resultados.stream().map(row -> new UsuarioTitulosDTO((String) row[0], (Long) row[1]))
-				.collect(Collectors.toList());
+		return titulosFacade.findOrderByMaxTitulos();
 	}
 
 	@PostMapping
 	public Titulos createTitulos(@RequestBody Titulos titulos) {
-		return titulosRepository.save(titulos);
+		return titulosFacade.createTitulos(titulos);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<Titulos> updateTitulos(@PathVariable Long id, @RequestBody Titulos titulos) {
-		Optional<Titulos> optionalTitulos = titulosRepository.findById(id);
-
-		if (!optionalTitulos.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		Titulos existingTitulos = optionalTitulos.get();
-		existingTitulos.setAno(titulos.getAno());
-		existingTitulos.setCampeonato(titulos.getCampeonato());
-		existingTitulos.setUsuario(titulos.getUsuario());
-		existingTitulos.setEquipe(titulos.getEquipe());
-
-		Titulos updatedsetQtdTitulos = titulosRepository.save(existingTitulos);
-		return ResponseEntity.ok(updatedsetQtdTitulos);
+		return titulosFacade.updateTitulos(id, titulos);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteTitulos(@PathVariable Long id) {
-		Optional<Titulos> optionalTitulos = titulosRepository.findById(id);
-
-		if (!optionalTitulos.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		titulosRepository.deleteById(id);
-		return ResponseEntity.ok().build();
+		return titulosFacade.deleteTitulos(id);
 	}
 }

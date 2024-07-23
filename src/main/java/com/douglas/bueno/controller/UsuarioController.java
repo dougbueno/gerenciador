@@ -14,57 +14,39 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.douglas.bueno.facade.UsuarioFacade;
 import com.douglas.bueno.model.Usuarios;
-import com.douglas.bueno.repository.UsuariosRepository;
 
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
 	@Autowired
-	private UsuariosRepository usuariosRepository;
+	private UsuarioFacade usuarioFacade;
 
 	@GetMapping
 	public List<Usuarios> getAllUsuarios() {
-		return usuariosRepository.findAllByOrderByNomeAsc();
+		return usuarioFacade.getAllUsuarios();
 	}
 
 	@GetMapping("/{id}")
 	public Optional<Usuarios> getPorId(@PathVariable Long id) {
-		return usuariosRepository.findById(id);
+		return usuarioFacade.getPorId(id);
 	}
 
 	@PostMapping("/criar")
 	public Usuarios createUsuarios(@RequestBody Usuarios usuarios) {
-
-		return usuariosRepository.save(usuarios);
+		return usuarioFacade.createUsuarios(usuarios);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<Usuarios> updateUsuarios(@PathVariable Long id, @RequestBody Usuarios usuarios) {
-		Optional<Usuarios> optionalUsuarios = usuariosRepository.findById(id);
 
-		if (!optionalUsuarios.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		Usuarios existingUsuarios = optionalUsuarios.get();
-		existingUsuarios.setNome(usuarios.getNome());
-		existingUsuarios.setEquipe(usuarios.getEquipe() == null ? existingUsuarios.getEquipe(): usuarios.getEquipe());
-
-		Usuarios updatedusuario = usuariosRepository.save(existingUsuarios);
-		return ResponseEntity.ok(updatedusuario);
+		return usuarioFacade.updateUsuarios(id, usuarios);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUsuarios(@PathVariable Long id) {
-		Optional<Usuarios> optionalUsuarios = usuariosRepository.findById(id);
-
-		if (!optionalUsuarios.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		usuariosRepository.deleteById(id);
-		return ResponseEntity.ok().build();
+		return usuarioFacade.deleteUsuarios(id);
 	}
 }

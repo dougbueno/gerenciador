@@ -14,55 +14,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.douglas.bueno.facade.CampeonatosFacade;
 import com.douglas.bueno.model.Campeonatos;
-import com.douglas.bueno.repository.CampeonatosRepository;
 
 @RestController
 @RequestMapping("/api/campeonatos")
 public class CampeonatosController {
 
 	@Autowired
-	private CampeonatosRepository campeonatosRepository;
+	private CampeonatosFacade campeonatosFacade;
 
 	@GetMapping
 	public List<Campeonatos> getAllCampeonatos() {
-		return campeonatosRepository.findAllByOrderByNomeCampeonatoAsc();
+		return campeonatosFacade.getAllCampeonatos();
 	}
 
 	@GetMapping("/{id}")
 	public Optional<Campeonatos> getById(@PathVariable Long id) {
-		return campeonatosRepository.findById(id);
+		return campeonatosFacade.getById(id);
 	}
 
 	@PostMapping
 	public Campeonatos createCampeonatos(@RequestBody Campeonatos campeonatos) {
-		return campeonatosRepository.save(campeonatos);
+		return campeonatosFacade.createCampeonatos(campeonatos);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Campeonatos> updateCampeonatos(@PathVariable Long id, @RequestBody Campeonatos campeonatos) {
-		Optional<Campeonatos> optionalCampeonatos = campeonatosRepository.findById(id);
-
-		if (!optionalCampeonatos.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		Campeonatos existingCampeoantos = optionalCampeonatos.get();
-		existingCampeoantos.setNomeCampeonato(campeonatos.getNomeCampeonato());
-
-		Campeonatos updatedCampeonatos = campeonatosRepository.save(existingCampeoantos);
-		return ResponseEntity.ok(updatedCampeonatos);
+	public ResponseEntity<?> updateCampeonatos(@PathVariable Long id, @RequestBody Campeonatos campeonatos) {
+		return campeonatosFacade.updateCampeonatos(id, campeonatos);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteCampeonatos(@PathVariable Long id) {
-		Optional<Campeonatos> optionalCampeonatos = campeonatosRepository.findById(id);
-
-		if (!optionalCampeonatos.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		campeonatosRepository.deleteById(id);
-		return ResponseEntity.ok().build();
+		return campeonatosFacade.deleteCampeonatos(id);
 	}
 }

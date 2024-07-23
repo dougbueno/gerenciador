@@ -101,7 +101,7 @@
             const finalizarAmistosoBtn = document.getElementById('finalizarAmistosoBtn');
 
             function carregarUsuarios() {
-                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/usuarios')
+                fetch('http://localhost:8080/api/usuarios')
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(usuario => {
@@ -121,7 +121,7 @@
             }
 
             function carregarResultados() {
-                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso')
+                fetch('http://localhost:8080/api/jogos/amistoso')
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(resultado => {
@@ -177,7 +177,7 @@
                     campeonato: "Amistoso"
                 };
 
-                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso', {
+                fetch('http://localhost:8080/api/jogos/amistoso', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -210,7 +210,7 @@
             });
 
             function atualizaStatusAtivo() {
-                fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso/atualizar', {
+                fetch('http://localhost:8080/api/jogos/amistoso/atualizar', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -408,7 +408,7 @@
                     golsVisitante: golsVisitante
                 };
 
-                fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso/${resultado.id}`, {
+                fetch(`http://localhost:8080/api/jogos/amistoso/${resultado.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -436,7 +436,7 @@
             }
 
             function excluirResultado(resultado, linha) {
-                fetch(`https://gerenciador-80123adaa7f2.herokuapp.com/api/jogos/amistoso/${resultado.id}`, {
+                fetch(`http://localhost:8080/api/jogos/amistoso/${resultado.id}`, {
                     method: 'DELETE'
                 })
                     .then(response => {

@@ -31,7 +31,7 @@
 
     <script>
         $(document).ready(function () {
-            fetch('https://gerenciador-80123adaa7f2.herokuapp.com/api/titulos')
+            fetch('http://localhost:8080/api/titulos')
                 .then(response => response.json())
                 .then(data => {
                     const titulosContainer = document.getElementById('titulosContainer');
