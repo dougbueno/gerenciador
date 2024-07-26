@@ -1,6 +1,7 @@
 package com.douglas.bueno.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,11 @@ public class TitulosController {
 	@GetMapping
 	public List<Titulos> getAllTitulos() {
 		return titulosFacade.getAllTitulos();
+	}
+	
+	@GetMapping("/{id}")
+	public Optional<Titulos> getPorId(@PathVariable Long id) {
+		return titulosFacade.getPorId(id);
 	}
 
 	@GetMapping("/listaCampeoes")

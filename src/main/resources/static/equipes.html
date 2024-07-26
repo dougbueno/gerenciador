@@ -79,7 +79,7 @@
 
             // Função para editar uma equipe
             window.editarEquipe = function (id) {
-                fetch(`${apiUrl}/api/equipes/${id}`)
+                fetch(`http://localhost:8080/api/equipes/${id}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('equipeId').value = data.id;

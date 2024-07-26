@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.douglas.bueno.dto.UsuarioTitulosDTO;
 import com.douglas.bueno.facade.TitulosFacade;
 import com.douglas.bueno.model.Titulos;
+import com.douglas.bueno.model.Usuarios;
 import com.douglas.bueno.repository.TitulosRepository;
 
 
@@ -25,6 +26,11 @@ public class TitulosServiceFacadeImpl implements TitulosFacade {
 	@Override
 	public List<Titulos> getAllTitulos() {
 		return titulosRepository.findAllOrderedByAnoDescAndIdDesc();
+	}
+	
+	@Override
+	public Optional<Titulos> getPorId(@PathVariable Long id) {
+		return titulosRepository.findById(id);
 	}
 
 	@Override
