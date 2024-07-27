@@ -50,9 +50,9 @@
             </div>
 
             <div class="mb-3">
-                <label for="titulo" class="form-label">titulo:</label>
-                <select id="titulo" name="titulo" class="form-select" required>
-                    <option value="" disabled selected>Selecione uma titulo</option>
+                <label for="equipe" class="form-label">Equipe:</label>
+                <select id="equipe" name="equipe" class="form-select" required>
+                    <option value="" disabled selected>Selecione uma Equipe</option>
                 </select>
             </div>
 
@@ -61,15 +61,6 @@
 
         <h2 class="my-4">Lista de Títulos</h2>
         <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Ano</th>
-                    <th scope="col">Campeonato</th>
-                    <th scope="col">Usuário</th>
-                    <th scope="col">Equipe</th>
-                    <th scope="col">Ações</th>
-                </tr>
-            </thead>
             <tbody id="tabelaTitulos">
                 <!-- Linhas da tabela serão populadas dinamicamente via JavaScript -->
             </tbody>
@@ -87,7 +78,7 @@
                 fetch('http://localhost:8080/api/equipes/')
                     .then(response => response.json())
                     .then(dataEquipes => {
-                        const selectEquipe = document.getElementById('titulo');
+                        const selectEquipe = document.getElementById('equipe');
                         dataEquipes.forEach(titulo => {
                             const option = document.createElement('option');
                             option.value = titulo.nomeEquipe;
@@ -135,24 +126,43 @@
                         const tableBody = document.getElementById('tabelaTitulos');
                         tableBody.innerHTML = ''; // Limpa o conteúdo atual da tabela
 
-                        data.forEach(titulo => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                        <td>${titulo.ano}</td>
-                        <td>${titulo.campeonato}</td>
-                        <td>${titulo.usuario}</td>
-                        <td>${titulo.equipe}</td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm" onclick="editarUsuario(${titulo.id})">Editar</button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="excluirUsuario(${titulo.id})">Excluir</button>
-                        </td>
+                        // Agrupar títulos por campeonato
+                        const campeonatosMap = data.reduce((map, titulo) => {
+                            if (!map[titulo.campeonato]) {
+                                map[titulo.campeonato] = [];
+                            }
+                            map[titulo.campeonato].push(titulo);
+                            return map;
+                        }, {});
+
+                        // Adicionar linhas para cada campeonato e títulos
+                        Object.keys(campeonatosMap).forEach(campeonato => {
+                            // Adiciona uma linha para o campeonato
+                            const trCampeonato = document.createElement('tr');
+                            trCampeonato.innerHTML = `
+                        <td colspan="5"><h3>${campeonato}</h3></td>
                     `;
-                            tableBody.appendChild(tr);
+                            tableBody.appendChild(trCampeonato);
+
+                            // Adiciona linhas para cada título dentro do campeonato
+                            campeonatosMap[campeonato].forEach(titulo => {
+                                const trTitulo = document.createElement('tr');
+                                trTitulo.innerHTML = `
+                            <td>${titulo.ano}</td>
+                            <td>${titulo.campeonato}</td>
+                            <td>${titulo.usuario}</td>
+                            <td>${titulo.equipe}</td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm" onclick="editarTitulo(${titulo.id})">Editar</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="excluirTitulo(${titulo.id})">Excluir</button>
+                            </td>
+                        `;
+                                tableBody.appendChild(trTitulo);
+                            });
                         });
                     })
                     .catch(error => console.error('Erro ao carregar títulos:', error));
             }
-
 
             window.editarTitulo = function (id) {
                 fetch(`http://localhost:8080/api/titulos/${id}`)
@@ -161,8 +171,8 @@
                         document.getElementById('tituloId').value = data.id;
                         document.getElementById('ano').value = data.ano;
                         document.getElementById('usuario').value = data.usuario;
-                        document.getElementById('nomeCampeonato').value = data.nomeCampeonato;
-                        document.getElementById('nomeEquipe').value = data.nomeEquipe;
+                        document.getElementById('campeonato').value = data.campeonato;
+                        document.getElementById('equipe').value = data.equipe;
                     })
                     .catch(error => console.error('Erro ao carregar titulo:', error));
             }
@@ -178,7 +188,7 @@
                                 throw new Error(`HTTP error! status: ${response.status}`);
                             }
                             alert('Titulo excluída com sucesso!');
-                            carregarEquipes(); // Atualiza a tabela após excluir a titulo com sucesso
+                            carregarTitulos(); // Atualiza a tabela após excluir a titulo com sucesso
                         })
                         .catch(error => {
                             console.error('Erro:', error);
@@ -195,9 +205,9 @@
                 const tituloId = formData.get('tituloId');
                 const titulo = {
                     ano: formData.get('ano'),
-                    campeonato: formData.get('nomeCampeonato'),
+                    campeonato: formData.get('campeonato'),
                     usuario: formData.get('usuario'),
-                    equipe: formData.get('nomeEquipe')
+                    equipe: formData.get('equipe')
                 };
 
                 const url = tituloId ? `http://localhost:8080/api/titulos/${tituloId}` : `http://localhost:8080/api/titulos`;
@@ -218,7 +228,7 @@
                     })
                     .then(() => {
                         alert('titulo gravado com sucesso!');
-                        carregarEquipes(); // Atualiza a tabela após gravar a titulo com sucesso
+                        carregarTitulos(); // Atualiza a tabela após gravar a titulo com sucesso
                         this.reset(); // Limpa o formulário
                         document.getElementById('tituloId').value = ''; // Limpa o campo oculto de ID
                     })
