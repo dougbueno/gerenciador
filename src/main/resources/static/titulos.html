@@ -24,42 +24,41 @@
 
     <div id="header"></div> <!-- Div where the header will be inserted -->
 
-    <div class="container mt-4">
-        <h1 class="mt-4">Cadastro de Título</h1>
+    <div class="container">
+        <h2>Cadastro de Título</h2>
 
         <form id="tituloForm">
             <input type="hidden" id="tituloId" name="tituloId">
-            <div class="mb-3">
-                <label for="ano" class="form-label">Ano:</label>
-                <input type="number" class="form-control" id="ano" name="ano" min="1900" max="2099" step="1"
-                    placeholder="Ex: 2024" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="campeonato" class="form-label">Campeonato:</label>
-                <select id="campeonato" name="campeonato" class="form-select" required>
-                    <option value="" disabled selected>Selecione um campeonato</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="usuario" class="form-label">Usuário:</label>
-                <select id="usuario" name="usuario" class="form-select" required>
-                    <option value="" disabled selected>Selecione um usuario</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="equipe" class="form-label">Equipe:</label>
-                <select id="equipe" name="equipe" class="form-select" required>
-                    <option value="" disabled selected>Selecione uma Equipe</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-success mt-4">Gravar</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ano:</th>
+                        <th>Campeonato:</th>
+                        <th>Usuário:</th>
+                        <th>Equipe:</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="number" class="form-control" id="ano" name="ano" min="1900" max="2099" step="1"
+                                placeholder="Ex: 2024" required></td>
+                        <td><select id="campeonato" name="campeonato" class="form-select" required>
+                                <option value="" disabled selected>Selecione um campeonato</option>
+                            </select></td>
+                        <td><select id="usuario" name="usuario" class="form-select" required>
+                                <option value="" disabled selected>Selecione um usuario</option>
+                            </select></td>
+                        <td><select id="equipe" name="equipe" class="form-select" required>
+                                <option value="" disabled selected>Selecione uma Equipe</option>
+                            </select></td>
+                        <td><button type="submit" class="btn btn-success">Gravar</button></td>
+                    </tr>
+                </tbody>
+            </table>
         </form>
 
-        <h2 class="my-4">Lista de Títulos</h2>
+        <h3 class="my-4">Lista de Títulos</h3>
         <table class="table">
             <tbody id="tabelaTitulos">
                 <!-- Linhas da tabela serão populadas dinamicamente via JavaScript -->
@@ -140,7 +139,7 @@
                             // Adiciona uma linha para o campeonato
                             const trCampeonato = document.createElement('tr');
                             trCampeonato.innerHTML = `
-                        <td colspan="5"><h3>${campeonato}</h3></td>
+                        <td colspan="5"><h4>${campeonato}</h4></td>
                     `;
                             tableBody.appendChild(trCampeonato);
 
