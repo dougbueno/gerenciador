@@ -29,23 +29,18 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th><label for="nome">Nome:</label></th>
-                        <th><label for="equipe">Equipe:</label></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="text" class="form-control" id="nome" name="nome" required></td>
-                        <td>
+                        <th>Nome:</th>
+                        <th><input type="text" class="form-control" id="nome" name="nome" required></th>
+                        <th>Equipe:</th>
+                        <th>
                             <select class="form-control" id="equipe" name="equipe" required>
                                 <option value="" disabled selected>Selecione uma equipe</option>
                                 <!-- Opções de equipe serão populadas dinamicamente via JavaScript -->
                             </select>
-                        </td>
+                        </th>
                         <td><button type="submit" class="btn btn-success">Gravar</button></td>
                     </tr>
-                </tbody>
+                </thead>
             </table>
         </form>
 
